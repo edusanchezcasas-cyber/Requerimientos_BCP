@@ -175,6 +175,16 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
 .who-client{background:var(--brass-bg);color:var(--brass)}
 .modal-context{background:#f6f7f9;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:-4px 0 14px;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
 .modal-hint{font-size:11.5px;color:var(--slate);background:var(--brass-bg);border:1px solid var(--brass-line);border-radius:8px;padding:9px 11px}
+.doc-row{display:flex;gap:8px;margin-bottom:8px}
+.doc-row input{flex:1;border:1px solid var(--line-strong);border-radius:8px;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink)}
+.doc-row .rm-doc{border:1px solid var(--line-strong);background:var(--paper-raised);color:var(--slate);border-radius:8px;width:34px;cursor:pointer;font-size:15px}
+.draft-badge{display:inline-block;font-size:9.5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-line);border-radius:5px;padding:1px 6px;margin-left:6px}
+.send-bar{display:flex;align-items:center;gap:10px;background:var(--blue-bg);border:1px solid var(--blue-line);border-radius:10px;padding:9px 14px;margin-bottom:12px}
+.send-bar b{color:var(--blue)}
+.draft-check{width:15px;height:15px;cursor:pointer;accent-color:var(--gold)}
+.action-cell{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.del-btn{border:1px solid var(--line-strong);background:var(--paper-raised);color:var(--slate);border-radius:7px;width:28px;height:28px;cursor:pointer;font-size:13px;flex-shrink:0}
+.del-btn:hover{background:var(--seal-bg);border-color:var(--seal-line);color:var(--seal)}
 .area-unassigned{background:transparent;color:var(--slate-soft);border:1px dashed var(--line-strong)}
 .distribute-row{display:flex;gap:6px;align-items:center}
 .distribute-row select{border:1px solid var(--line-strong);border-radius:7px;padding:6px 7px;font-size:11.5px;font-family:var(--sans)}
@@ -205,6 +215,7 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .field label{display:block;font-size:11.5px;font-weight:600;color:var(--slate);margin-bottom:5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.03em}
 .field input,.field select,.field textarea{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink)}
+.field input:disabled{background:var(--paper);color:var(--slate);cursor:not-allowed}
 .field.full{grid-column:1/-1}
 .modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
 .upload-zone{border:2px dashed var(--line-strong);border-radius:12px;background:#f6f7f9;padding:22px;text-align:center;cursor:pointer;display:block}
@@ -304,7 +315,10 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
     </div>
     <div id="tableAll"></div>
   </section>
-  <section id="requested" class="panel"><div id="tableRequested"></div></section>
+  <section id="requested" class="panel">
+    <div class="send-bar" id="sendBar" style="display:none"><span></span><button class="btn btn-teal btn-sm" onclick="sendSelectedDrafts()">Enviar requerimiento al cliente</button></div>
+    <div id="tableRequested"></div>
+  </section>
   <section id="delivered" class="panel"><div id="tableDelivered"></div></section>
   <section id="pending" class="panel"><div id="tablePending"></div></section>
   <section id="history" class="panel">
@@ -332,14 +346,17 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
 <div class="modal" id="modal"><div class="modal-box"><h3>Nuevo requerimiento de información</h3>
   <div class="modal-context" id="modalContext"></div>
   <div class="form-grid">
-  <div class="field full"><label>Documento o información requerida</label><input id="fDoc" placeholder="Ej.: Boletas de pago de enero a junio de 2026"></div>
-  <div class="field"><label>Fecha de requerimiento</label><input id="fReqDate" type="date"></div>
+  <div class="field"><label>Fecha de requerimiento</label><input id="fReqDate" type="date" disabled></div>
   <div class="field"><label>¿Para cuándo necesita los documentos?</label><input id="fDate" type="date"></div>
-  <div class="field"><label>Urgencia</label><select id="fPriority"><option>Alta</option><option>Media</option><option>Baja</option></select></div>
-  <div class="field"><label>Diligencia</label><select id="fMilestone"><option>Contestación de demanda</option><option>Audiencia de conciliación</option><option>Audiencia de juzgamiento</option><option>Audiencia Única</option></select></div>
+  <div class="field full"><label>Hito procesal</label><select id="fMilestone"><option>Contestación de demanda</option><option>Audiencia de conciliación</option><option>Audiencia de juzgamiento</option><option>Audiencia Única</option></select></div>
+  <div class="field full">
+    <label>Documentos o información requerida</label>
+    <div id="docList"></div>
+    <span class="link" onclick="addDocRow()">+ Agregar otro documento</span>
+  </div>
   <div class="field full"><label>Observaciones</label><textarea id="fObs" rows="3" placeholder="Detalle del formato, periodo o validación necesaria"></textarea></div>
-  <div class="field full"><div class="modal-hint">El cliente recibirá este encargo y lo distribuirá internamente al área correspondiente — el abogado no asigna el área.</div></div>
-</div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-teal" onclick="addRequirement()">Guardar y notificar al cliente</button></div></div></div>
+  <div class="field full"><div class="modal-hint">El cliente recibirá este encargo cuando lo envíes desde la pestaña "Solicitado" — el abogado no asigna el área.</div></div>
+</div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-teal" onclick="addRequirement()">Guardar</button></div></div></div>
 
 
 <div class="modal" id="uploadModal"><div class="modal-box"><h3>Subir documento solicitado</h3><p class="small" id="uploadDescription">Adjunta el archivo correspondiente al requerimiento.</p><label class="upload-zone" for="uploadInput"><div class="upload-icon">☁️</div><b>Haz clic para seleccionar uno o varios archivos</b><div class="small" style="margin-top:6px">PDF, Word, Excel, imágenes o archivos comprimidos</div><input id="uploadInput" type="file" multiple onchange="previewFiles(this.files)"><div id="filePreview"></div></label><div class="field full" style="margin-top:14px"><label>Comentario del área responsable</label><textarea id="uploadComment" rows="3" placeholder="Ej.: Se adjuntan las boletas completas. El archivo incluye enero a junio de 2026."></textarea></div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeUploadModal()">Cancelar</button><button class="btn btn-teal" onclick="confirmUpload()">Subir y registrar entrega</button></div></div></div>
@@ -469,11 +486,13 @@ let currentCaseByRole={abogado:'c27705',cliente:'c27705'};
 let data = datasets[currentCase].items;
 let uploadIndex=null; let selectedFiles=[]; let openDetail=null;
 let currentRole='abogado'; let clientArea='__coordinador__';
+let draftSelection=new Set();
 const labels={done:'Entregado',partial:'Parcial',pending:'Pendiente',requested:'Solicitado'};
 const classes={done:'s-done',partial:'s-partial',pending:'s-pending',requested:'s-requested'};
 
 function setRole(role){
   currentRole=role;
+  draftSelection.clear();
   document.getElementById('roleBtnAbogado').classList.toggle('active',role==='abogado');
   document.getElementById('roleBtnCliente').classList.toggle('active',role==='cliente');
   document.getElementById('clientAreaSelect').style.display = role==='cliente'?'inline-block':'none';
@@ -520,6 +539,7 @@ function matchesFilters(x){
   const area=document.getElementById('fArea')?.value||'';
   const status=document.getElementById('fStatus')?.value||'';
   if(currentRole==='cliente'){
+    if(x.sent===false)return false;
     if(clientArea!=='__coordinador__' && x.area!==clientArea)return false;
   }
   if(q && !x.doc.toLowerCase().includes(q))return false;
@@ -572,9 +592,12 @@ function table(items,tabId){
     const obsCount=(x.history&&x.history.length)||0;
     const unassigned = !x.area;
     const isCoordinator = currentRole==='cliente' && clientArea==='__coordinador__';
+    const isDraft = currentRole==='abogado' && x.sent===false;
     let action;
     if(unassigned){
-      if(isCoordinator){
+      if(isDraft){
+        action = `<span class="small">Sin enviar al cliente</span>`;
+      } else if(isCoordinator){
         action = `<span class="small">Elige el área en la columna izquierda</span>`;
       } else if(currentRole==='abogado'){
         action = `<span class="small">Esperando distribución del cliente</span>`;
@@ -596,7 +619,8 @@ function table(items,tabId){
       areaCell = unassigned ? `<span class="area area-unassigned">Sin distribuir</span>` : `<span class="area ${areaClass[x.area]||''}">${x.area}</span>`;
     }
     const rowClass = overdue ? 'row-overdue' : (dueSoon ? 'row-soon' : '');
-    let rows = `<tr class="data-row ${rowClass}" onclick="toggleDetail('${rowId}')"><td><b>${x.doc}</b>${x.file?`<div class="file-chip">${fileIcon(x.file)} ${x.file}</div>`:''}<div class="requested-by">Solicitado por Abg. ${x.owner}</div><div class="expander">${openDetail===rowId?'▴':'▾'} ${obsCount} observación${obsCount===1?'':'es'}</div></td><td>${areaCell}</td><td class="due-mono">${x.req}</td><td class="${dueClass}">${fmtDate(x.due)}${overdue?' · vencido':dueSoon?' · próximo':''}</td><td><span class="status ${classes[x.status]}"><span class="dot"></span>${labels[x.status]}</span></td><td>${x.owner}</td><td>${x.milestone}</td><td>${action}</td></tr>`;
+    const delBtn = currentRole==='abogado' ? `<button class="del-btn" onclick="event.stopPropagation();deleteRequirement(${realIdx})" title="Eliminar requerimiento">🗑</button>` : '';
+    let rows = `<tr class="data-row ${rowClass}" onclick="toggleDetail('${rowId}')"><td>${isDraft?`<input type="checkbox" class="draft-check" onclick="event.stopPropagation()" onchange="toggleDraftSelect(${realIdx},this.checked)" ${draftSelection.has(x)?'checked':''}> `:''}<b>${x.doc}</b>${isDraft?'<span class="draft-badge">Borrador</span>':''}${x.file?`<div class="file-chip">${fileIcon(x.file)} ${x.file}</div>`:''}<div class="requested-by">Solicitado por Abg. ${x.owner}</div><div class="expander">${openDetail===rowId?'▴':'▾'} ${obsCount} observación${obsCount===1?'':'es'}</div></td><td>${areaCell}</td><td class="due-mono">${x.req}</td><td class="${dueClass}">${fmtDate(x.due)}${overdue?' · vencido':dueSoon?' · próximo':''}</td><td><span class="status ${classes[x.status]}"><span class="dot"></span>${labels[x.status]}</span></td><td>${x.owner}</td><td>${x.milestone}</td><td><div class="action-cell">${action}${delBtn}</div></td></tr>`;
     if(openDetail===rowId){rows+=`<tr class="detail-row"><td colspan="8">${historyBlock(x,realIdx)}</td></tr>`}
     return rows;
   }).join('')}</tbody></table>`;
@@ -696,6 +720,7 @@ function render(){
 
   if(document.getElementById('allCasesGrid').style.display!=='none') renderAllCasesGrid();
   renderHistoricos();
+  renderSendBar();
 }
 
 function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id))}
@@ -711,6 +736,7 @@ function switchCase(key){
   currentCase=key;
   currentCaseByRole[currentRole]=key;
   data=datasets[key].items;
+  draftSelection.clear();
   openDetail=null;
   document.getElementById('fSearch').value='';
   document.getElementById('fArea').value='';
@@ -720,29 +746,88 @@ function switchCase(key){
 }
 
 function todayISO(){return TODAY.toISOString().slice(0,10)}
+let docRowCount=0;
+function docRowHtml(id){
+  return `<div class="doc-row" id="docRow${id}"><input id="docInput${id}" placeholder="Ej.: Boletas de pago de enero a junio de 2026"><button type="button" class="rm-doc" onclick="removeDocRow(${id})" title="Quitar">×</button></div>`;
+}
+function addDocRow(){
+  docRowCount++;
+  document.getElementById('docList').insertAdjacentHTML('beforeend', docRowHtml(docRowCount));
+}
+function removeDocRow(id){
+  const el=document.getElementById('docRow'+id);
+  if(document.querySelectorAll('#docList .doc-row').length<=1){toast('Debe quedar al menos un documento.');return}
+  if(el) el.remove();
+}
 function openModal(){
   const ds=datasets[currentCase];
   document.getElementById('fReqDate').value=todayISO();
   const suggested=new Date(TODAY.getTime()+5*86400000);
   document.getElementById('fDate').value=suggested.toISOString().slice(0,10);
   document.getElementById('modalContext').innerHTML=`Exp. ${ds.expediente} · ${ds.contraparte} vs. BCP<br>${ds.audienciaTipo} · ${fmtDate(ds.dueDate)}${ds.audienciaHora?' · '+ds.audienciaHora:''} — solicita: Abg. ${ds.responsable}`;
+  docRowCount=0;
+  document.getElementById('docList').innerHTML='';
+  addDocRow();
+  document.getElementById('fObs').value='';
   document.getElementById('modal').classList.add('show');
 }
 function closeModal(){document.getElementById('modal').classList.remove('show')}
 function addRequirement(){
-  const doc=document.getElementById('fDoc').value.trim();
-  if(!doc){toast('Ingresa el documento requerido.');return}
   const ds=datasets[currentCase];
   const reqDateISO=document.getElementById('fReqDate').value||todayISO();
   const dueDateISO=document.getElementById('fDate').value;
   if(!dueDateISO){toast('Indica para cuándo necesitas los documentos.');return}
-  data.push({doc,area:null,req:fmtDate(reqDateISO),due:dueDateISO,status:'requested',owner:ds.responsable,priority:document.getElementById('fPriority').value,milestone:document.getElementById('fMilestone').value,history:mkHistory([[`${fmtDate(reqDateISO).slice(0,5)} ${String(TODAY.getHours()).padStart(2,'0')}:${String(TODAY.getMinutes()).padStart(2,'0')}`,`Abg. ${ds.responsable}`,document.getElementById('fObs').value.trim()||`Nuevo requerimiento registrado (urgencia ${document.getElementById('fPriority').value.toLowerCase()}).`]])});
-  closeModal();document.getElementById('fDoc').value='';document.getElementById('fObs').value='';
-  render();showTab('all');
-  toast('Requerimiento enviado al cliente para su distribución interna.');
+  const inputs=[...document.querySelectorAll('#docList .doc-row input')];
+  const docs=inputs.map(i=>i.value.trim()).filter(Boolean);
+  if(!docs.length){toast('Ingresa al menos un documento requerido.');return}
+  const obs=document.getElementById('fObs').value.trim();
+  const milestone=document.getElementById('fMilestone').value;
+  docs.forEach(doc=>{
+    data.push({doc,area:null,req:fmtDate(reqDateISO),due:dueDateISO,status:'requested',owner:ds.responsable,sent:false,milestone,history:mkHistory([[`${fmtDate(reqDateISO).slice(0,5)} ${String(TODAY.getHours()).padStart(2,'0')}:${String(TODAY.getMinutes()).padStart(2,'0')}`,`Abg. ${ds.responsable}`,obs||'Documento registrado internamente, pendiente de envío al cliente.']])});
+  });
+  closeModal();
+  render();showTab('requested');
+  toast(`${docs.length} documento(s) guardado(s) como borrador. Selecciónalos en "Solicitado" para enviarlos al cliente.`);
+}
+
+function toggleDraftSelect(realIdx,checked){
+  const x=data[realIdx];
+  if(checked) draftSelection.add(x); else draftSelection.delete(x);
+  renderSendBar();
+}
+function renderSendBar(){
+  const bar=document.getElementById('sendBar');
+  if(!bar)return;
+  const n=draftSelection.size;
+  bar.style.display = n>0 ? 'flex':'none';
+  bar.querySelector('span').innerHTML = `<b>${n}</b> requerimiento${n===1?'':'s'} seleccionado${n===1?'':'s'}`;
+}
+function sendSelectedDrafts(){
+  if(!draftSelection.size){toast('Selecciona al menos un requerimiento para enviar.');return}
+  const hh=String(TODAY.getHours()).padStart(2,'0'), mm=String(TODAY.getMinutes()).padStart(2,'0');
+  draftSelection.forEach(x=>{
+    x.sent=true;
+    x.history=x.history||[];
+    x.history.push({date:`16/07 ${hh}:${mm}`,author:`Abg. ${x.owner}`,text:'Requerimiento enviado al cliente.'});
+  });
+  const n=draftSelection.size;
+  draftSelection.clear();
+  render();
+  toast(`${n} requerimiento(s) enviado(s) al cliente.`);
 }
 
 function sendReminder(i){toast(`Recordatorio enviado al área de ${data[i].area} sobre "${data[i].doc}".`)}
+
+function deleteRequirement(realIdx){
+  const x=data[realIdx];
+  if(!x)return;
+  if(!confirm(`¿Eliminar el requerimiento "${x.doc}"? Esta acción no se puede deshacer.`))return;
+  data.splice(realIdx,1);
+  draftSelection.delete(x);
+  openDetail=null;
+  render();
+  toast('Requerimiento eliminado.');
+}
 
 function openUploadModal(i){uploadIndex=i;selectedFiles=[];document.getElementById('uploadDescription').innerHTML=`Requerimiento: <b>${data[i].doc}</b><br>Área responsable: ${data[i].area}`;document.getElementById('filePreview').innerHTML='';document.getElementById('uploadInput').value='';document.getElementById('uploadComment').value='';document.getElementById('uploadModal').classList.add('show')}
 function closeUploadModal(){document.getElementById('uploadModal').classList.remove('show')}
