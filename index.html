@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Portal Requerimiento de Información · V&T</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a2e; --ink-soft:#2a2a45; --paper:#f4f5f7; --paper-raised:#ffffff;
+  --line:#e5e5ea; --line-strong:#d3d3db;
+  --seal:#c23b3b; --seal-bg:#fdecec; --seal-line:#f6c9c9;
+  --brass:#b6790a; --brass-bg:#fff6e0; --brass-line:#f2dfa6;
+  --teal:#1f9d55; --teal-bg:#e9f8ef; --teal-line:#bfe9cf;
+  --blue:#2f6fd6; --blue-bg:#eaf1fd; --blue-line:#cfe0fa;
+  --purple:#7c4fd6; --purple-bg:#f1ecfb; --purple-line:#ddd0f7;
+  --slate:#6b7280; --slate-soft:#9ca3af;
+  --gold:#8b1a2e;
+  --bcp-navy:#002664; --bcp-orange:#ff6720;
+  --shadow:0 10px 30px rgba(20,20,40,.07);
+  --serif:'Manrope',system-ui,sans-serif;
+  --sans:'Manrope',system-ui,sans-serif;
+  --mono:'Manrope',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sans);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+::selection{background:var(--gold);color:#fff}
+.mono-num{font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+a,button,[tabindex],select,input,textarea{outline-offset:2px}
+a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold)}
+
+/* ---------- Letterhead ---------- */
+header{background:linear-gradient(160deg,var(--ink),var(--ink-soft));color:#fff;padding:26px 32px 22px;position:relative;border-bottom:3px solid var(--gold)}
+.letterhead{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.logo-mark{width:38px;height:38px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--sans);font-weight:800;font-size:12px;letter-spacing:.02em;flex-shrink:0}
+.brand .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9099b8;margin:0 0 6px;display:flex;align-items:center;gap:8px}
+.client-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,103,32,.16);color:#ffb388;border:1px solid rgba(255,103,32,.35);border-radius:20px;padding:2px 9px;font-size:10px;letter-spacing:.04em}
+.brand h1{font-family:var(--serif);font-weight:700;font-size:22px;margin:0 0 6px;letter-spacing:-.01em}
+.brand p{margin:0;color:#9099b8;font-size:13px}
+.header-right{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.clock{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:8px 14px 8px 8px}
+.clock svg{display:block}
+.clock .clock-label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#c3cbdd;margin:0}
+.clock .clock-value{font-family:var(--serif);font-size:19px;font-weight:700;color:#fff;margin:1px 0 0;font-variant-numeric:tabular-nums}
+.role-switch{display:flex;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:9px;padding:3px;gap:2px}
+.role-btn{border:0;background:transparent;color:#c3cbdd;font-family:var(--sans);font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer}
+.role-btn.active{background:#fff;color:var(--ink)}
+.role-area{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:8px;padding:8px 10px;font-family:var(--sans);font-size:12.5px}
+.role-area option{color:var(--ink)}
+.btn{border:0;border-radius:8px;padding:10px 15px;font-weight:600;cursor:pointer;font-family:var(--sans);font-size:13.5px;transition:transform .08s,filter .12s}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:#fff;color:var(--ink)}
+.btn-primary:hover{filter:brightness(.96)}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-teal:hover{filter:brightness(1.08)}
+.btn-ghost{background:#eef0f3;color:#3a4257}
+.btn-ghost:hover{filter:brightness(.97)}
+.btn-seal{background:var(--seal-bg);color:var(--seal)}
+.btn-sm{padding:6px 11px;font-size:12px;border-radius:7px}
+
+/* ---------- Layout ---------- */
+.layout{display:block}
+.topnav{background:var(--paper-raised);border-bottom:1px solid var(--line);padding:0 30px;display:flex;gap:4px;position:sticky;top:0;z-index:15}
+.topnav-item{padding:14px 6px;margin-right:22px;cursor:pointer;color:var(--slate);font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:7px;border-bottom:3px solid transparent}
+.topnav-item.active{color:var(--ink);border-color:var(--gold)}
+.topnav-item:hover:not(.active){color:var(--ink)}
+.badge{font-family:var(--mono);font-size:10.5px;padding:1px 7px;border-radius:10px;background:var(--paper);color:var(--slate);border:1px solid var(--line)}
+main{padding:26px 30px 60px;overflow:auto;max-width:1400px;margin:0 auto}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:20px;flex-wrap:wrap}
+.topbar h2{margin:0;font-family:var(--serif);font-size:22px;font-weight:600}
+.topbar p{margin:6px 0 0;color:var(--slate);font-size:13.5px}
+.case-selector{background:var(--paper-raised);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:11px 16px;min-width:340px}
+.case-selector label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--slate-soft);display:block}
+.case-selector select{width:100%;border:0;font-weight:700;font-size:14.5px;outline:none;margin-top:4px;background:transparent;font-family:var(--sans);color:var(--ink);cursor:pointer}
+.case-file{background:var(--paper-raised);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:0 0 18px}
+.case-file .cf-head{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--slate-soft);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.case-file .cf-head:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.case-file-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 20px}
+.cf-field{min-width:0}
+.cf-field .cf-label{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--slate-soft);margin-bottom:3px}
+.cf-field .cf-value{font-size:13.5px;color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cf-field .cf-value.mono{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums;color:var(--slate)}
+
+/* ---------- KPI cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.card{background:var(--paper-raised);border:1px solid var(--line);border-radius:11px;padding:15px;animation:statIn .35s ease-out backwards}
+.card:nth-child(1){animation-delay:.02s}.card:nth-child(2){animation-delay:.07s}.card:nth-child(3){animation-delay:.12s}.card:nth-child(4){animation-delay:.17s}.card:nth-child(5){animation-delay:.22s}
+@keyframes statIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card .label{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--slate-soft)}
+.card .value{font-family:var(--serif);font-size:26px;font-weight:600;margin:7px 0 3px}
+.card .hint{font-size:11px;color:var(--slate-soft)}
+.value.green{color:var(--teal)}.value.amber{color:var(--brass)}.value.red{color:var(--seal)}.value.ink{color:var(--ink)}
+
+
+.all-cases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:11px;margin:0 0 18px}
+.case-card{background:var(--paper-raised);border:1px solid var(--line);border-radius:11px;padding:13px;cursor:pointer;transition:border-color .12s}
+.case-card:hover{border-color:var(--teal)}
+.case-card.current{border-color:var(--teal);background:var(--teal-bg)}
+.case-card .cc-exp{font-family:var(--mono);font-size:10px;color:var(--slate-soft)}
+.case-card .cc-name{font-family:var(--serif);font-size:14px;font-weight:600;margin:4px 0 6px;color:var(--ink)}
+.case-card .cc-bar{height:6px;background:#eef0f3;border-radius:6px;overflow:hidden;margin:8px 0 6px}
+.case-card .cc-bar span{display:block;height:100%;background:var(--teal)}
+.case-card .cc-foot{display:flex;justify-content:space-between;font-size:11px;color:var(--slate)}
+.client-note{background:var(--paper-raised);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:2px 10px 10px 2px;padding:13px 16px;margin-bottom:16px;font-size:13px;color:var(--ink-soft)}
+.client-note b{color:var(--ink);font-family:var(--serif)}
+.alert{display:flex;justify-content:space-between;align-items:center;background:var(--seal-bg);border:1px solid var(--seal-line);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13px;gap:12px;flex-wrap:wrap}
+.alert strong{color:var(--seal);font-family:var(--serif)}
+
+/* ---------- Tabs ---------- */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-top:8px;overflow-x:auto}
+.tab{padding:11px 15px;cursor:pointer;color:var(--slate);font-weight:600;font-size:13px;border-bottom:3px solid transparent;white-space:nowrap;font-family:var(--sans)}
+.tab.active{color:var(--ink);border-color:var(--gold)}
+.tab:hover:not(.active){color:var(--ink)}
+.panel{display:none;background:var(--paper-raised);border:1px solid var(--line);border-radius:0 0 12px 12px;padding:18px;box-shadow:var(--shadow)}
+.panel.active{display:block}
+.toolbar{display:flex;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filters select,.filters input{border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;background:var(--paper-raised);color:var(--ink-soft);font-size:13px;font-family:var(--sans)}
+.filters input{min-width:210px}
+.empty-state{padding:36px 12px;text-align:center;color:var(--slate-soft);font-size:13px}
+
+/* ---------- Table ---------- */
+table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+th{text-align:left;color:#c7c9d9;background:var(--ink);padding:11px 11px;border-bottom:1px solid var(--ink);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+table:not(.req-table) th{border-radius:0}
+.req-table th:first-child{border-top-left-radius:8px}
+.req-table th:last-child{border-top-right-radius:8px}
+td{padding:12px 11px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:break-word}
+tr.data-row{cursor:pointer}
+tr.data-row:hover td{background:#f7f8fa}
+tr.data-row.row-soon td{background:var(--brass-bg)}
+tr.data-row.row-soon:hover td{background:#f7ecc9}
+tr.data-row.row-overdue td{background:var(--seal-bg)}
+tr.data-row.row-overdue:hover td{background:#f6d9d3}
+.area-select{border:1px solid var(--line-strong);border-radius:6px;padding:4px 6px;font-family:var(--mono);font-size:10.5px;background:var(--paper-raised);color:var(--ink-soft)}
+.status{display:inline-flex;align-items:center;gap:5px;border-radius:14px;padding:3px 9px;font-size:11px;font-weight:600;white-space:nowrap;border:1px solid transparent}
+.s-pending{background:var(--seal-bg);color:var(--seal);border-color:var(--seal-line)}
+.s-partial{background:var(--brass-bg);color:var(--brass);border-color:var(--brass-line)}
+.s-done{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-line)}
+.s-requested{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-line)}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.small{font-size:11.5px;color:var(--slate)}
+.critical{color:var(--seal);font-weight:700}
+.area{display:inline-block;font-weight:600;font-size:11px;padding:3px 9px;border-radius:6px;white-space:nowrap;font-family:var(--mono);letter-spacing:.01em;border:1px solid transparent}
+.area-legal{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-line)}
+.area-planillas{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-line)}
+.area-rrhh{background:var(--brass-bg);color:var(--brass);border-color:var(--brass-line)}
+.area-operaciones{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-line)}
+.link{color:var(--gold);font-weight:600;cursor:pointer;font-size:12.5px}
+.link:hover{text-decoration:underline}
+.file-chip{display:inline-flex;gap:6px;align-items:center;background:var(--paper);color:var(--ink-soft);border:1px solid var(--line);border-radius:14px;padding:4px 9px;margin-top:6px;font-size:11px;font-family:var(--mono);max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.due-mono{font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--slate)}
+.expander{display:inline-flex;align-items:center;gap:4px;color:var(--slate-soft);font-size:10.5px;margin-top:6px;font-family:var(--mono);cursor:pointer}
+.expander:hover{color:var(--gold)}
+table.req-table th:nth-child(1),table.req-table td:nth-child(1){width:26%}
+table.req-table th:nth-child(2),table.req-table td:nth-child(2){width:12%}
+table.req-table th:nth-child(3),table.req-table td:nth-child(3){width:10%}
+table.req-table th:nth-child(4),table.req-table td:nth-child(4){width:11%}
+table.req-table th:nth-child(5),table.req-table td:nth-child(5){width:10%}
+table.req-table th:nth-child(6),table.req-table td:nth-child(6){width:13%}
+table.req-table th:nth-child(7),table.req-table td:nth-child(7){width:11%}
+table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
+
+/* ---------- Detail / history drawer ---------- */
+.detail-row td{background:#f6f7f9;padding:0}
+.detail-inner{padding:14px 18px 18px 44px;border-left:3px solid var(--gold)}
+.detail-inner h4{font-family:var(--serif);font-size:13.5px;margin:0 0 10px;color:var(--ink)}
+.history-item{display:grid;grid-template-columns:120px 1fr;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.history-item:last-child{border-bottom:0}
+.history-item .h-meta{font-family:var(--mono);font-size:10.5px;color:var(--slate-soft);line-height:1.5}
+.history-item .h-text{font-size:12.5px;color:var(--ink-soft)}
+.who-tag{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.04em;padding:2px 6px;border-radius:4px;margin-right:7px;vertical-align:middle}
+.who-lawyer{background:var(--teal-bg);color:var(--teal)}
+.who-client{background:var(--brass-bg);color:var(--brass)}
+.modal-context{background:#f6f7f9;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:-4px 0 14px;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
+.modal-hint{font-size:11.5px;color:var(--slate);background:var(--brass-bg);border:1px solid var(--brass-line);border-radius:8px;padding:9px 11px}
+.area-unassigned{background:transparent;color:var(--slate-soft);border:1px dashed var(--line-strong)}
+.distribute-row{display:flex;gap:6px;align-items:center}
+.distribute-row select{border:1px solid var(--line-strong);border-radius:7px;padding:6px 7px;font-size:11.5px;font-family:var(--sans)}
+.requested-by{font-size:10.5px;color:var(--slate-soft);margin-top:2px}
+.add-obs{display:flex;gap:8px;margin-top:12px}
+.add-obs input{flex:1;border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;font-size:12.5px;font-family:var(--sans)}
+
+/* ---------- KPI panel ---------- */
+.kpi-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+.chart-card{border:1px solid var(--line);border-radius:10px;padding:16px}
+.chart-card strong{font-family:var(--serif);font-size:14.5px}
+.bar-row{display:grid;grid-template-columns:130px 1fr 46px;align-items:center;gap:10px;margin:13px 0}
+.bar-row span:first-child{font-size:12.5px;color:var(--ink-soft)}
+.bar{height:9px;background:#eef0f3;border-radius:7px;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--teal)}
+.bar-row b{font-family:var(--mono);font-size:12px}
+.timeline{border-left:2px solid var(--line-strong);margin-left:10px;padding-left:20px}
+.event{position:relative;margin:0 0 18px}
+.event:before{content:"";position:absolute;left:-27px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--paper-raised);border:3px solid var(--gold)}
+.event strong{font-size:13px;font-family:var(--serif)}
+.event p{font-size:11.5px;color:var(--slate);margin:4px 0;font-family:var(--mono)}
+
+/* ---------- Modal ---------- */
+.modal{display:none;position:fixed;inset:0;background:rgba(20,28,45,.5);align-items:center;justify-content:center;padding:20px;z-index:20}
+.modal.show{display:flex}
+.modal-box{width:min(650px,100%);max-height:90vh;overflow:auto;background:var(--paper-raised);border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.3);padding:24px}
+.modal-box h3{margin-top:0;font-family:var(--serif);font-size:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field label{display:block;font-size:11.5px;font-weight:600;color:var(--slate);margin-bottom:5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.03em}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink)}
+.field.full{grid-column:1/-1}
+.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+.upload-zone{border:2px dashed var(--line-strong);border-radius:12px;background:#f6f7f9;padding:22px;text-align:center;cursor:pointer;display:block}
+.upload-zone:hover{border-color:var(--teal);background:var(--teal-bg)}
+.upload-zone input{display:none}
+.upload-icon{font-size:26px}
+
+/* ---------- Toast ---------- */
+#toastHost{position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;gap:8px;z-index:50}
+.toast{background:var(--ink);color:#fff;padding:12px 16px;border-radius:9px;font-size:13px;box-shadow:0 10px 26px rgba(0,0,0,.25);display:flex;align-items:center;gap:10px;animation:toastIn .18s ease-out;border-left:3px solid var(--gold)}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:1100px){.cards{grid-template-columns:repeat(2,1fr)}.kpi-grid{grid-template-columns:1fr}.header-right{width:100%;justify-content:space-between}.topnav{overflow-x:auto}.case-file-grid{grid-template-columns:repeat(2,1fr)}}
+@media(prefers-reduced-motion:reduce){.toast{animation:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="letterhead">
+    <div class="brand" style="display:flex;align-items:center;gap:13px">
+      <div class="logo-mark">V&amp;T</div>
+      <div>
+        <p class="eyebrow">Vinatea &amp; Toyama · CID <span class="client-pill">Cliente: BCP</span></p>
+        <h1>Portal Requerimiento de Información</h1>
+        <p>Control de requerimientos, medios probatorios y tiempos de respuesta</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="clock" id="clockWrap">
+        <svg width="46" height="46" viewBox="0 0 46 46"><circle cx="23" cy="23" r="19" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="4"/><circle id="clockRing" cx="23" cy="23" r="19" fill="none" stroke="#b6790a" stroke-width="4" stroke-linecap="round" transform="rotate(-90 23 23)"/></svg>
+        <div><p class="clock-label" id="clockLabel">Vence contestación</p><p class="clock-value" id="clockValue">7 días</p></div>
+      </div>
+      <div class="role-switch" id="roleSwitch">
+        <button class="role-btn active" id="roleBtnAbogado" onclick="setRole('abogado')">Abogado V&amp;T</button>
+        <button class="role-btn" id="roleBtnCliente" onclick="setRole('cliente')">Cliente</button>
+      </div>
+      <select id="clientAreaSelect" class="role-area" onchange="setClientArea(this.value)" style="display:none">
+        <option value="__coordinador__">Coordinación (recibe encargos)</option>
+        <option>Recursos Humanos</option><option>Planillas</option><option>Legal Interno</option><option>Operaciones</option>
+      </select>
+      <button class="btn btn-primary" id="newReqBtn" onclick="openModal()">+ Nuevo requerimiento</button>
+    </div>
+  </div>
+  <nav class="topnav">
+    <div class="topnav-item active" id="menuExpedientes" onclick="showSection('expedientes')">📁 Expedientes <span class="badge">6</span></div>
+    <div class="topnav-item" id="menuKpi" onclick="showSection('kpi')">📊 KPI</div>
+  </nav>
+</header>
+<div class="layout">
+<main>
+<div id="expedientesView">
+  <div style="margin:0 0 12px"><span class="link" onclick="toggleAllCases()" id="toggleAllCasesLink">Ver los 6 expedientes como procesos individuales ▾</span></div>
+  <div class="all-cases-grid" id="allCasesGrid" style="display:none;margin-bottom:16px"></div>
+
+  <div class="topbar">
+    <div><h2>Gestión de medios probatorios</h2></div>
+    <div class="case-selector"><label>Expediente seleccionado</label>
+      <select id="caseSelect" onchange="switchCase(this.value)">
+        <option value="c27705">Exp. 00237-2026-0-2208-JR-LA-01</option>
+        <option value="c28050">Exp. 02804-2026-0-1706-JR-LA-02</option>
+        <option value="c27889">Exp. 00209-2026-0-1408-JR-LA-01</option>
+        <option value="c27945">Exp. 01254-2026-0-0401-JP-LA-09</option>
+        <option value="c28186">Exp. 01248-2026-0-1501-JR-LA-03</option>
+        <option value="c28070">Exp. 00904-2026-0-3208-JR-LA-01</option>
+      </select>
+    </div>
+  </div>
+  <div class="case-file"><div class="cf-head">Ficha del expediente</div><div class="case-file-grid" id="caseMeta"></div></div>
+
+  <div class="cards">
+    <div class="card"><div class="label">Total requerido</div><div class="value ink" id="totalCount">12</div><div class="hint">Documentos / datos</div></div>
+    <div class="card"><div class="label">Entregado completo</div><div class="value green" id="doneCount">6</div><div class="hint" id="doneHint">50% del total</div></div>
+    <div class="card"><div class="label">Entrega parcial</div><div class="value amber" id="partialCount">2</div><div class="hint">Requiere subsanación</div></div>
+    <div class="card"><div class="label">Falta por entregar</div><div class="value red" id="pendingCount">4</div><div class="hint" id="pendingHint">2 próximos a vencer</div></div>
+  </div>
+
+  <div class="client-note"><b>Cómo funciona:</b> el abogado de V&T registra el requerimiento con su urgencia y fecha de entrega — no asigna área. El cliente (Coordinación) recibe el encargo, lo distribuye internamente al área correspondiente, y esa área adjunta el documento o conversa en el historial de observaciones.</div>
+
+  <div class="alert" id="alertBanner"><div><strong>Alerta de gestión:</strong> <span id="alertText">Recursos Humanos tiene 2 requerimientos vencidos y Legal Interno aún no confirma la carta de cese.</span></div><button class="btn btn-ghost btn-sm" onclick="showTab('pending')">Ver pendientes</button></div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="all" onclick="showTab('all')">Todos</div>
+    <div class="tab" data-tab="requested" onclick="showTab('requested')">Solicitado</div>
+    <div class="tab" data-tab="delivered" onclick="showTab('delivered')">Entregado</div>
+    <div class="tab" data-tab="pending" onclick="showTab('pending')">Falta por entregar</div>
+    <div class="tab" data-tab="history" onclick="showTab('history')">Histórico reutilizable</div>
+  </div>
+
+  <section id="all" class="panel active">
+    <div class="toolbar">
+      <div class="filters">
+        <input id="fSearch" placeholder="Buscar documento..." oninput="render()">
+        <select id="fArea" onchange="render()" style="display:inline-block"><option value="">Todas las áreas</option><option>Recursos Humanos</option><option>Planillas</option><option>Legal Interno</option><option>Operaciones</option></select>
+        <select id="fStatus" onchange="render()"><option value="">Todos los estados</option><option value="falta">Falta por entregar (todo)</option><option value="requested">Solicitado</option><option value="pending">Pendiente</option><option value="partial">Parcial</option><option value="done">Entregado</option></select>
+      </div>
+      <button class="btn btn-teal btn-sm" id="addReqToolbarBtn" onclick="openModal()">Agregar requerimiento</button>
+    </div>
+    <div id="tableAll"></div>
+  </section>
+  <section id="requested" class="panel"><div id="tableRequested"></div></section>
+  <section id="delivered" class="panel"><div id="tableDelivered"></div></section>
+  <section id="pending" class="panel"><div id="tablePending"></div></section>
+  <section id="history" class="panel">
+    <div class="toolbar"><div><strong style="font-family:var(--serif);font-size:14.5px">Repositorio histórico de la empresa</strong><div class="small">Documentos generales de BCP que no cambian por proceso — abogado y cliente pueden verificar si ya fueron entregados antes de pedirlos de nuevo.</div></div></div>
+    <div id="historicTable"></div>
+  </section>
+</div>
+
+<div id="kpiView" style="display:none">
+  <div class="topbar"><div><h2>KPI y cumplimiento por área</h2><p>Desempeño del cliente en la atención de requerimientos, agregado a nivel de cartera BCP</p></div></div>
+  <div class="kpi-grid">
+    <div class="chart-card"><strong>Cumplimiento de requerimientos por área</strong><div class="small">Porcentaje atendido dentro del plazo acordado</div>
+      <div class="bar-row"><span>Planillas</span><div class="bar"><span style="width:92%"></span></div><b>92%</b></div>
+      <div class="bar-row"><span>Operaciones</span><div class="bar"><span style="width:80%"></span></div><b>80%</b></div>
+      <div class="bar-row"><span>Legal Interno</span><div class="bar"><span style="width:68%"></span></div><b>68%</b></div>
+      <div class="bar-row"><span>Recursos Humanos</span><div class="bar"><span style="width:55%"></span></div><b>55%</b></div>
+      <table style="margin-top:6px"><thead><tr><th>Área</th><th>Promedio respuesta</th><th>Vencidos</th><th>Completo al 1.er envío</th></tr></thead><tbody><tr><td>Planillas</td><td class="due-mono">1.2 días</td><td>0</td><td>89%</td></tr><tr><td>Operaciones</td><td class="due-mono">2.1 días</td><td>1</td><td>80%</td></tr><tr><td>Legal Interno</td><td class="due-mono">3.4 días</td><td>1</td><td>72%</td></tr><tr><td>Recursos Humanos</td><td class="due-mono">4.8 días</td><td class="critical">3</td><td>58%</td></tr></tbody></table>
+    </div>
+    <div class="chart-card"><strong>Trazabilidad del expediente activo</strong><div class="timeline" style="margin-top:18px"><div class="event"><strong>Demanda notificada</strong><p>10/07/2026 · 09:15</p></div><div class="event"><strong>Requerimientos enviados</strong><p>10/07/2026 · 11:40 · Abg. Alessandra Zegarra</p></div><div class="event"><strong>Primer documento recibido</strong><p>11/07/2026 · 16:05 · Planillas</p></div><div class="event"><strong>Recordatorio automático</strong><p>13/07/2026 · 08:00 · 4 pendientes</p></div><div class="event"><strong>Fecha límite interna</strong><p>17/07/2026 · 18:00</p></div></div></div>
+  </div>
+</div>
+</main>
+</div>
+
+<div class="modal" id="modal"><div class="modal-box"><h3>Nuevo requerimiento de información</h3>
+  <div class="modal-context" id="modalContext"></div>
+  <div class="form-grid">
+  <div class="field full"><label>Documento o información requerida</label><input id="fDoc" placeholder="Ej.: Boletas de pago de enero a junio de 2026"></div>
+  <div class="field"><label>Fecha de requerimiento</label><input id="fReqDate" type="date"></div>
+  <div class="field"><label>¿Para cuándo necesita los documentos?</label><input id="fDate" type="date"></div>
+  <div class="field"><label>Urgencia</label><select id="fPriority"><option>Alta</option><option>Media</option><option>Baja</option></select></div>
+  <div class="field"><label>Diligencia</label><select id="fMilestone"><option>Contestación de demanda</option><option>Audiencia de conciliación</option><option>Audiencia de juzgamiento</option><option>Audiencia Única</option></select></div>
+  <div class="field full"><label>Observaciones</label><textarea id="fObs" rows="3" placeholder="Detalle del formato, periodo o validación necesaria"></textarea></div>
+  <div class="field full"><div class="modal-hint">El cliente recibirá este encargo y lo distribuirá internamente al área correspondiente — el abogado no asigna el área.</div></div>
+</div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-teal" onclick="addRequirement()">Guardar y notificar al cliente</button></div></div></div>
+
+
+<div class="modal" id="uploadModal"><div class="modal-box"><h3>Subir documento solicitado</h3><p class="small" id="uploadDescription">Adjunta el archivo correspondiente al requerimiento.</p><label class="upload-zone" for="uploadInput"><div class="upload-icon">☁️</div><b>Haz clic para seleccionar uno o varios archivos</b><div class="small" style="margin-top:6px">PDF, Word, Excel, imágenes o archivos comprimidos</div><input id="uploadInput" type="file" multiple onchange="previewFiles(this.files)"><div id="filePreview"></div></label><div class="field full" style="margin-top:14px"><label>Comentario del área responsable</label><textarea id="uploadComment" rows="3" placeholder="Ej.: Se adjuntan las boletas completas. El archivo incluye enero a junio de 2026."></textarea></div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeUploadModal()">Cancelar</button><button class="btn btn-teal" onclick="confirmUpload()">Subir y registrar entrega</button></div></div></div>
+
+<div id="toastHost"></div>
+
+<script>
+const TODAY = new Date('2026-07-16T09:00:00');
+
+function mkHistory(arr){return arr.map(h=>({date:h[0],author:h[1],text:h[2]}))}
+
+const datasets = {
+ c27705:{
+  label:'Exp. 00237-2026-0-2208-JR-LA-01 · Erick Justo Del Aguila vs. BCP',
+  subtitle:'V&T Indemnización por daños · V&T Despido arbitrario — Juzgado de Trabajo, Tarapoto',
+  contraparte:'Erick Justo Del Aguila', expediente:'00237-2026-0-2208-JR-LA-01', materia:'V&T Indemnización por daños', submateria:'V&T Despido arbitrario', viaProcesal:'Laboral - NLPT - Ordinario', naturaleza:'Demandado', organo:'Juzgado de Trabajo — Tarapoto', distrito:'San Martín', especialista:'Carlos Montoya Cabrera', responsable:'Alessandra Zegarra', supervisor:'Samuel Paz',
+  audienciaTipo:'Audiencia de Juzgamiento', audienciaHora:'09:00', dueDate:'2026-07-17',
+  items:[
+   {doc:'Carta de despido y cargo de recepción',area:'Legal Interno',req:'08/07/2026',due:'2026-07-10',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia de Juzgamiento',file:'carta_despido_erick.pdf',history:mkHistory([['08/07 10:15','Abg. Alessandra Zegarra','Se requiere carta de despido y cargo de recepción para exp. 00237-2026.'],['10/07 09:40','Legal Interno','Se adjunta carta y cargo firmado por el trabajador.']])},
+   {doc:'Informe de la jefatura sobre los hechos imputados',area:'Operaciones',req:'08/07/2026',due:'2026-07-11',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia de Juzgamiento',file:'informe_jefatura_erick.docx',history:mkHistory([['08/07 10:15','Abg. Alessandra Zegarra','Se requiere informe de la jefatura sobre la causal invocada.'],['11/07 14:20','Operaciones','Se adjunta informe firmado por el jefe directo.']])},
+   {doc:'Descargos presentados por el trabajador',area:'Recursos Humanos',req:'08/07/2026',due:'2026-07-12',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia de Juzgamiento',file:'descargos_erick.pdf',history:mkHistory([['08/07 10:15','Abg. Alessandra Zegarra','Se requiere copia de los descargos, si los hubiera.'],['12/07 08:50','Recursos Humanos','Se adjuntan descargos presentados el 03/07.']])},
+   {doc:'Boletas de pago (últimos 6 meses)',area:'Planillas',req:'08/07/2026',due:'2026-07-11',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia de Juzgamiento',file:'boletas_erick.pdf',history:mkHistory([['08/07 10:15','Abg. Alessandra Zegarra','Requerido para sustentar la remuneración computable.'],['11/07 11:05','Planillas','Se adjunta consolidado de boletas.']])},
+   {doc:'Contrato de trabajo y adendas',area:'Recursos Humanos',req:'08/07/2026',due:'2026-07-10',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia de Juzgamiento',file:'contrato_erick.pdf',history:mkHistory([['08/07 10:15','Abg. Alessandra Zegarra','Requerido para contestación.'],['10/07 09:30','Recursos Humanos','Se adjunta contrato vigente y adenda 2024.']])},
+   {doc:'Liquidación de beneficios sociales',area:'Planillas',req:'08/07/2026',due:'2026-07-16',status:'pending',owner:'Alessandra Zegarra',milestone:'Audiencia de Juzgamiento',history:mkHistory([['08/07 10:15','Abg. Alessandra Zegarra','Se requiere liquidación para sustentar el monto pagado al cese.'],['15/07 08:00','Sistema','Recordatorio automático: audiencia de juzgamiento el 17/07.'],['16/07 07:30','Sistema','Segundo recordatorio, audiencia en menos de 24 horas.']])}
+  ]
+ },
+ c28050:{
+  label:'Exp. 02804-2026-0-1706-JR-LA-02 · Anderson Castañeda Abanto vs. BCP',
+  subtitle:'V&T Impugnación de despido · V&T Despido fraudulento — 2° Juzgado Laboral, Chiclayo',
+  contraparte:'Anderson Castañeda Abanto', expediente:'02804-2026-0-1706-JR-LA-02', materia:'V&T Impugnación de despido', submateria:'V&T Despido fraudulento', viaProcesal:'Laboral - NLPT - Ordinario', naturaleza:'Demandado', organo:'2° Juzgado Laboral', distrito:'Lambayeque', especialista:'Henry Ayala Farfan', responsable:'Alessandra Zegarra', supervisor:'Samuel Paz',
+  audienciaTipo:'Audiencia de Conciliación', audienciaHora:'09:00', dueDate:'2026-07-20',
+  items:[
+   {doc:'Carta de imputación de cargos y descargos',area:'Legal Interno',req:'10/07/2026',due:'2026-07-14',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia de Conciliación',file:'carta_imputacion_anderson.pdf',history:mkHistory([['10/07 09:00','Abg. Alessandra Zegarra','Se requiere carta de imputación y descargos del trabajador.'],['14/07 15:10','Legal Interno','Se adjunta carta e informe de descargos.']])},
+   {doc:'Boletas de pago (últimos 6 meses)',area:'Planillas',req:'10/07/2026',due:'2026-07-13',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia de Conciliación',file:'boletas_anderson.pdf',history:mkHistory([['10/07 09:00','Abg. Alessandra Zegarra','Requerido para contestación.'],['13/07 10:30','Planillas','Se adjunta consolidado.']])},
+   {doc:'Contrato de trabajo y adendas',area:'Recursos Humanos',req:'10/07/2026',due:'2026-07-14',status:'partial',owner:'Alessandra Zegarra',milestone:'Audiencia de Conciliación',file:'contrato_anderson_v1.pdf',history:mkHistory([['10/07 09:00','Abg. Alessandra Zegarra','Requerido para contestación.'],['14/07 12:00','Recursos Humanos','Se adjunta contrato, falta anexo de modificación de puesto.']])},
+   {doc:'Informe del procedimiento disciplinario',area:'Recursos Humanos',req:'10/07/2026',due:'2026-07-17',status:'pending',owner:'Alessandra Zegarra',milestone:'Audiencia de Conciliación',history:mkHistory([['10/07 09:00','Abg. Alessandra Zegarra','Se requiere informe completo del procedimiento disciplinario seguido.'],['16/07 08:00','Sistema','Recordatorio automático enviado a Recursos Humanos.']])},
+   {doc:'Correos del proceso de investigación interna',area:null,req:'11/07/2026',due:'2026-07-18',status:'requested',owner:'Alessandra Zegarra',milestone:'Audiencia de Conciliación',history:mkHistory([['11/07 09:20','Abg. Alessandra Zegarra','Se requiere cadena de correos de la investigación interna.']])}
+  ]
+ },
+ c27889:{
+  label:'Exp. 00209-2026-0-1408-JR-LA-01 · Mirian Molina Casas vs. BCP',
+  subtitle:'V&T Impugnación de despido · V&T Despido fraudulento — Juzgado de Trabajo, Sede Chincha',
+  contraparte:'Mirian Molina Casas', expediente:'00209-2026-0-1408-JR-LA-01', materia:'V&T Impugnación de despido', submateria:'V&T Despido fraudulento', viaProcesal:'Laboral - NLPT - Abreviado', naturaleza:'Demandado', organo:'Juzgado de Trabajo — Sede Chincha', distrito:'Ica', especialista:'Gina Valdivieso Moron', responsable:'Alessandra Zegarra', supervisor:'Samuel Paz',
+  audienciaTipo:'Audiencia Única', audienciaHora:'11:00', dueDate:'2026-07-20',
+  items:[
+   {doc:'Carta de despido y cargo de recepción',area:'Legal Interno',req:'09/07/2026',due:'2026-07-13',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia Única',file:'carta_despido_mirian.pdf',history:mkHistory([['09/07 10:00','Abg. Alessandra Zegarra','Se requiere carta de despido y cargo de recepción.'],['13/07 09:45','Legal Interno','Se adjunta documentación completa.']])},
+   {doc:'Boletas de pago (últimos 6 meses)',area:'Planillas',req:'09/07/2026',due:'2026-07-14',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia Única',file:'boletas_mirian.pdf',history:mkHistory([['09/07 10:00','Abg. Alessandra Zegarra','Requerido para contestación.'],['14/07 11:15','Planillas','Se adjunta consolidado de boletas.']])},
+   {doc:'Contrato de trabajo y adendas',area:'Recursos Humanos',req:'09/07/2026',due:'2026-07-13',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia Única',file:'contrato_mirian.pdf',history:mkHistory([['09/07 10:00','Abg. Alessandra Zegarra','Requerido para contestación.'],['13/07 08:30','Recursos Humanos','Se adjunta contrato vigente.']])},
+   {doc:'Informe de la jefatura sobre los hechos imputados',area:'Operaciones',req:'09/07/2026',due:'2026-07-17',status:'partial',owner:'Alessandra Zegarra',milestone:'Audiencia Única',file:'informe_jefatura_mirian_borrador.docx',history:mkHistory([['09/07 10:00','Abg. Alessandra Zegarra','Se requiere informe con el detalle de los hechos imputados.'],['17/07 09:00','Operaciones','Se adjunta borrador, pendiente firma del jefe directo.']])},
+   {doc:'Liquidación de beneficios sociales',area:null,req:'09/07/2026',due:'2026-07-18',status:'requested',owner:'Alessandra Zegarra',milestone:'Audiencia Única',history:mkHistory([['09/07 10:00','Abg. Alessandra Zegarra','Requerido para sustentar el monto liquidado al cese.']])}
+  ]
+ },
+ c27945:{
+  label:'Exp. 01254-2026-0-0401-JP-LA-09 · Pastora Quispe Pandia vs. BCP',
+  subtitle:'V&T Beneficios sociales — 9° Juzgado de Paz Letrado Laboral, Sede Central',
+  contraparte:'Pastora Quispe Pandia', expediente:'01254-2026-0-0401-JP-LA-09', materia:'V&T Beneficios sociales', submateria:'V&T Beneficios sociales', viaProcesal:'Laboral - NLPT - Abreviado', naturaleza:'Demandado', organo:'9° Juzgado de Paz Letrado Laboral — Sede Central', distrito:'Arequipa', especialista:'Fernando Mamani Mamani', responsable:'Alessandra Zegarra', supervisor:'Samuel Paz',
+  audienciaTipo:'Audiencia Única', audienciaHora:'09:00', dueDate:'2026-07-22',
+  items:[
+   {doc:'Boletas de pago del periodo reclamado',area:'Planillas',req:'11/07/2026',due:'2026-07-16',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia Única',file:'boletas_pastora.pdf',history:mkHistory([['11/07 09:30','Abg. Alessandra Zegarra','Se requiere boletas del periodo reclamado en la demanda.'],['16/07 08:40','Planillas','Se adjunta consolidado del periodo.']])},
+   {doc:'Contrato de trabajo y adendas',area:'Recursos Humanos',req:'11/07/2026',due:'2026-07-15',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia Única',file:'contrato_pastora.pdf',history:mkHistory([['11/07 09:30','Abg. Alessandra Zegarra','Requerido para contestación.'],['15/07 10:00','Recursos Humanos','Se adjunta contrato y adendas.']])},
+   {doc:'Tabla salarial y política remunerativa aplicable',area:'Recursos Humanos',req:'11/07/2026',due:'2026-07-18',status:'pending',owner:'Alessandra Zegarra',milestone:'Audiencia Única',history:mkHistory([['11/07 09:30','Abg. Alessandra Zegarra','Se requiere la política remunerativa vigente en el periodo reclamado.']])},
+   {doc:'Reporte de beneficios y asignaciones otorgadas',area:null,req:'11/07/2026',due:'2026-07-19',status:'requested',owner:'Alessandra Zegarra',milestone:'Audiencia Única',history:mkHistory([['11/07 09:30','Abg. Alessandra Zegarra','Requerido para contrastar lo reclamado con lo efectivamente pagado.']])}
+  ]
+ },
+ c28186:{
+  label:'Exp. 01248-2026-0-1501-JR-LA-03 · Yessica Guzman Escobar vs. BCP',
+  subtitle:'V&T Impugnación de despido · V&T Despido fraudulento — 3º Juzgado de Trabajo, Sede Central',
+  contraparte:'Yessica Guzman Escobar', expediente:'01248-2026-0-1501-JR-LA-03', materia:'V&T Impugnación de despido', submateria:'V&T Despido fraudulento', viaProcesal:'Laboral - NLPT - Abreviado', naturaleza:'Demandado', organo:'3º Juzgado de Trabajo — Sede Central', distrito:'Junín', especialista:'Maria Del Rosario Alfaro Barreto', responsable:'Alessandra Zegarra', supervisor:'Samuel Paz',
+  audienciaTipo:'Audiencia Única', audienciaHora:'10:00', dueDate:'2026-07-24',
+  items:[
+   {doc:'Carta de despido y cargo de recepción',area:'Legal Interno',req:'12/07/2026',due:'2026-07-17',status:'done',owner:'Alessandra Zegarra',milestone:'Audiencia Única',file:'carta_despido_yessica.pdf',history:mkHistory([['12/07 11:00','Abg. Alessandra Zegarra','Se requiere carta de despido y cargo de recepción.'],['17/07 09:15','Legal Interno','Se adjunta documentación.']])},
+   {doc:'Boletas de pago (últimos 6 meses)',area:null,req:'12/07/2026',due:'2026-07-18',status:'requested',owner:'Alessandra Zegarra',milestone:'Audiencia Única',history:mkHistory([['12/07 11:00','Abg. Alessandra Zegarra','Requerido para contestación.']])},
+   {doc:'Contrato de trabajo y adendas',area:null,req:'12/07/2026',due:'2026-07-18',status:'requested',owner:'Alessandra Zegarra',milestone:'Audiencia Única',history:mkHistory([['12/07 11:00','Abg. Alessandra Zegarra','Requerido para contestación.']])},
+   {doc:'Informe de la jefatura sobre los hechos imputados',area:'Operaciones',req:'12/07/2026',due:'2026-07-20',status:'pending',owner:'Alessandra Zegarra',milestone:'Audiencia Única',history:mkHistory([['12/07 11:00','Abg. Alessandra Zegarra','Se requiere informe con el detalle de los hechos imputados.']])}
+  ]
+ },
+ c28070:{
+  label:'Exp. 00904-2026-0-3208-JR-LA-01 · Nancy Mengoa Chalco vs. BCP',
+  subtitle:'V&T Impugnación de despido · V&T Despido fraudulento — 1° Juzgado de Trabajo, Zona 03',
+  contraparte:'Nancy Mengoa Chalco', expediente:'00904-2026-0-3208-JR-LA-01', materia:'V&T Impugnación de despido', submateria:'V&T Despido fraudulento', viaProcesal:'Laboral - NLPT - Ordinario', naturaleza:'Demandado', organo:'1° Juzgado de Trabajo — Zona 03', distrito:'Lima Este', especialista:'Greta Yupanqui Alvarado', responsable:'Alessandra Zegarra', supervisor:'Samuel Paz',
+  audienciaTipo:'Audiencia de Conciliación', audienciaHora:'09:30', dueDate:'2026-07-30',
+  items:[
+   {doc:'Carta de despido y cargo de recepción',area:null,req:'14/07/2026',due:'2026-07-21',status:'requested',owner:'Alessandra Zegarra',milestone:'Audiencia de Conciliación',history:mkHistory([['14/07 10:00','Abg. Alessandra Zegarra','Se requiere carta de despido y cargo de recepción.']])},
+   {doc:'Boletas de pago (últimos 6 meses)',area:null,req:'14/07/2026',due:'2026-07-22',status:'requested',owner:'Alessandra Zegarra',milestone:'Audiencia de Conciliación',history:mkHistory([['14/07 10:00','Abg. Alessandra Zegarra','Requerido para contestación.']])},
+   {doc:'Contrato de trabajo y adendas',area:null,req:'14/07/2026',due:'2026-07-23',status:'requested',owner:'Alessandra Zegarra',milestone:'Audiencia de Conciliación',history:mkHistory([['14/07 10:00','Abg. Alessandra Zegarra','Requerido para contestación.']])},
+   {doc:'Informe de la jefatura sobre los hechos imputados',area:null,req:'14/07/2026',due:'2026-07-25',status:'requested',owner:'Alessandra Zegarra',milestone:'Audiencia de Conciliación',history:mkHistory([['14/07 10:00','Abg. Alessandra Zegarra','Se requiere informe con el detalle de los hechos imputados.']])},
+   {doc:'Liquidación de beneficios sociales',area:null,req:'14/07/2026',due:'2026-07-27',status:'requested',owner:'Alessandra Zegarra',milestone:'Audiencia de Conciliación',history:mkHistory([['14/07 10:00','Abg. Alessandra Zegarra','Requerido para sustentar el monto liquidado al cese.']])}
+  ]
+ }
+};
+
+const companyDocs=[
+ {name:'MOF de la empresa (Manual de Organización y Funciones)',origin:'Recursos Humanos',updated:'2026-02-10',vigente:true,keywords:['mof','descripción del puesto','funciones']},
+ {name:'Vigencia de poder del representante legal',origin:'Legal Interno',updated:'2026-06-01',vigente:true,keywords:['vigencia de poder','poder','representante legal']},
+ {name:'Reglamento Interno de Trabajo (RIT)',origin:'Legal Interno',updated:'2026-01-20',vigente:true,keywords:['reglamento interno','rit','política']},
+ {name:'Organigrama general de la empresa',origin:'Recursos Humanos',updated:'2025-11-05',vigente:false,keywords:['organigrama']},
+ {name:'Política y tabla remunerativa vigente',origin:'Recursos Humanos',updated:'2026-03-15',vigente:true,keywords:['tabla salarial','política remunerativa','remunerativa']},
+ {name:'Protocolo de prevención de hostigamiento laboral',origin:'Legal Interno',updated:'2026-04-22',vigente:true,keywords:['hostigamiento','protocolo']}
+];
+function renderHistoricos(){
+  const host=document.getElementById('historicTable');
+  if(!host)return;
+  host.innerHTML = `<table><thead><tr><th>Documento de la empresa</th><th>Origen</th><th>Última actualización</th><th>Vigencia</th><th>Acción</th></tr></thead><tbody>${companyDocs.map((d,i)=>{
+    const match = data.find(x=>!x.file && x.status!=='done' && d.keywords.some(k=>x.doc.toLowerCase().includes(k)));
+    const actionCell = match
+      ? `<span class="link" onclick="useHistoricDoc(${i})">Usar en «${match.doc}»</span>`
+      : `<span class="small">Sin coincidencia pendiente en este expediente</span>`;
+    return `<tr><td><b>${d.name}</b></td><td>${d.origin}</td><td class="due-mono">${fmtDate(d.updated)}</td><td><span class="status ${d.vigente?'s-done':'s-partial'}"><span class="dot"></span>${d.vigente?'Vigente':'Por actualizar'}</span></td><td>${actionCell}</td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+function useHistoricDoc(i){
+  const d=companyDocs[i];
+  const match = data.find(x=>!x.file && x.status!=='done' && d.keywords.some(k=>x.doc.toLowerCase().includes(k)));
+  if(!match){toast('Ese requerimiento ya no está pendiente en este expediente.');renderHistoricos();return}
+  const realIdx=data.indexOf(match);
+  match.status='done';
+  match.file=d.name.toLowerCase().replace(/[^a-z0-9]+/g,'_').slice(0,40)+'.pdf';
+  match.history=match.history||[];
+  const hh=String(TODAY.getHours()).padStart(2,'0'), mm=String(TODAY.getMinutes()).padStart(2,'0');
+  match.history.push({date:`16/07 ${hh}:${mm}`,author:'Repositorio histórico',text:`Se utilizó «${d.name}» (vigente, actualizado ${fmtDate(d.updated)}), sin necesidad de solicitarlo de nuevo al área.`});
+  toast(`«${d.name}» vinculado al requerimiento «${match.doc}».`);
+  render();
+}
+
+let currentCase='c27705';
+let currentCaseByRole={abogado:'c27705',cliente:'c27705'};
+let data = datasets[currentCase].items;
+let uploadIndex=null; let selectedFiles=[]; let openDetail=null;
+let currentRole='abogado'; let clientArea='__coordinador__';
+const labels={done:'Entregado',partial:'Parcial',pending:'Pendiente',requested:'Solicitado'};
+const classes={done:'s-done',partial:'s-partial',pending:'s-pending',requested:'s-requested'};
+
+function setRole(role){
+  currentRole=role;
+  document.getElementById('roleBtnAbogado').classList.toggle('active',role==='abogado');
+  document.getElementById('roleBtnCliente').classList.toggle('active',role==='cliente');
+  document.getElementById('clientAreaSelect').style.display = role==='cliente'?'inline-block':'none';
+  document.getElementById('fArea').style.display = role==='cliente'?'none':'inline-block';
+  document.getElementById('newReqBtn').style.display = role==='abogado'?'inline-block':'none';
+  const toolbarBtn=document.getElementById('addReqToolbarBtn'); if(toolbarBtn) toolbarBtn.style.display = role==='abogado'?'inline-block':'none';
+  document.getElementById('fSearch').value='';
+  document.getElementById('fArea').value='';
+  document.getElementById('fStatus').value='';
+  currentCase=currentCaseByRole[role];
+  data=datasets[currentCase].items;
+  document.getElementById('caseSelect').value=currentCase;
+  openDetail=null;
+  render();
+  toast(role==='abogado' ? 'Vista de Abogado V&T activada — visibilidad completa del expediente.' : `Vista de Cliente activada — solo ves y gestionas requerimientos de ${clientArea}.`);
+}
+function setClientArea(area){
+  clientArea=area;
+  document.getElementById('fSearch').value='';
+  document.getElementById('fStatus').value='';
+  openDetail=null;
+  render();
+  toast(area==='__coordinador__' ? 'Vista de Coordinación: distribuye los encargos recibidos.' : `Área del cliente activa: ${area}`);
+}
+
+function fmtDate(iso){const [y,m,d]=iso.split('-');return `${d}/${m}/${y}`}
+function daysDiff(iso){
+  const [y,m,d]=iso.split('-').map(Number);
+  const target=Date.UTC(y,m-1,d);
+  const today=Date.UTC(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());
+  return Math.round((target-today)/86400000);
+}
+function fileIcon(name){if(!name)return '📎';const ext=name.split('.').pop().toLowerCase();if(ext==='pdf')return '📄';if(['xls','xlsx','csv'].includes(ext))return '📊';if(['doc','docx'].includes(ext))return '📝';if(['jpg','jpeg','png'].includes(ext))return '🖼️';if(['zip','rar'].includes(ext))return '🗜️';return '📎'}
+
+function toast(msg){
+  const host=document.getElementById('toastHost');
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  host.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .25s';setTimeout(()=>t.remove(),250)},2600);
+}
+
+function matchesFilters(x){
+  const q=(document.getElementById('fSearch')?.value||'').toLowerCase().trim();
+  const area=document.getElementById('fArea')?.value||'';
+  const status=document.getElementById('fStatus')?.value||'';
+  if(currentRole==='cliente'){
+    if(clientArea!=='__coordinador__' && x.area!==clientArea)return false;
+  }
+  if(q && !x.doc.toLowerCase().includes(q))return false;
+  if(area && x.area!==area)return false;
+  if(status==='falta'){ if(x.status==='done')return false; }
+  else if(status && x.status!==status)return false;
+  return true;
+}
+
+function historyBlock(x,idx){
+  const items=x.history&&x.history.length?x.history.map(h=>{
+    const isLawyer = h.author.startsWith('Abg.') || h.author===datasets[currentCase].especialista;
+    const roleTag = h.author==='Sistema' ? '' : `<span class="who-tag ${isLawyer?'who-lawyer':'who-client'}">${isLawyer?'V&T':'Cliente'}</span>`;
+    return `<div class="history-item"><div class="h-meta">${h.date}<br>${h.author}</div><div class="h-text">${roleTag}${h.text}</div></div>`;
+  }).join(''):'<div class="small">Sin observaciones registradas.</div>';
+  return `<div class="detail-inner">
+    <h4>Historial de observaciones — ${x.doc}</h4>
+    ${items}
+    <div class="add-obs">
+      <input id="newObs${idx}" placeholder="${currentRole==='abogado'?'Agregar una observación como V&T...':'Agregar una observación como '+clientArea+'...'}">
+      <button class="btn btn-teal btn-sm" onclick="addObservation(${idx})">Registrar</button>
+    </div>
+  </div>`;
+}
+
+function addObservation(realIdx){
+  const input=document.getElementById('newObs'+realIdx);
+  const text=input.value.trim();
+  if(!text){toast('Escribe una observación antes de registrar.');return}
+  const x=data[realIdx];
+  const hh=String(TODAY.getHours()).padStart(2,'0'), mm=String(TODAY.getMinutes()).padStart(2,'0');
+  x.history=x.history||[];
+  const author = currentRole==='abogado' ? `Abg. ${datasets[currentCase].especialista}` : clientArea;
+  x.history.push({date:`16/07 ${hh}:${mm}`,author,text});
+  toast('Observación registrada en el expediente.');
+  render();
+}
+
+const areaClass={'Legal Interno':'area-legal','Planillas':'area-planillas','Recursos Humanos':'area-rrhh','Operaciones':'area-operaciones'};
+const AREAS=['Recursos Humanos','Planillas','Legal Interno','Operaciones'];
+function table(items,tabId){
+  if(!items.length)return '<div class="empty-state">No hay requerimientos que coincidan con los filtros aplicados.</div>';
+  return `<table class="req-table"><thead><tr><th>Información requerida</th><th>Área</th><th>Solicitado</th><th>Fecha límite</th><th>Estado</th><th>Abogado V&T</th><th>Diligencia</th><th>Acción</th></tr></thead><tbody>${items.map((x)=>{
+    const realIdx=data.indexOf(x);
+    const dd=daysDiff(x.due);
+    const overdue = dd<0 && x.status!=='done';
+    const dueSoon = !overdue && dd>=0 && dd<=2 && x.status!=='done';
+    const dueClass = overdue?'critical':'due-mono';
+    const rowId=`${tabId}-${realIdx}`;
+    const obsCount=(x.history&&x.history.length)||0;
+    const unassigned = !x.area;
+    const isCoordinator = currentRole==='cliente' && clientArea==='__coordinador__';
+    let action;
+    if(unassigned){
+      if(isCoordinator){
+        action = `<span class="small">Elige el área en la columna izquierda</span>`;
+      } else if(currentRole==='abogado'){
+        action = `<span class="small">Esperando distribución del cliente</span>`;
+      } else {
+        action = `<span class="small">Pendiente de coordinación</span>`;
+      }
+    } else if(x.status==='done'){
+      action = `<span class="link" onclick="event.stopPropagation();toast('Vista simulada del documento cargado por el cliente.')">Ver documento</span>`;
+    } else if(currentRole==='cliente'){
+      action = `<button class="btn btn-teal btn-sm" onclick="event.stopPropagation();openUploadModal(${realIdx})">Subir</button>`;
+    } else {
+      action = `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();sendReminder(${realIdx})">Recordar al cliente</button>`;
+    }
+    let areaCell;
+    if(isCoordinator){
+      const opts = ['<option value="" '+(unassigned?'selected':'')+'>Sin distribuir</option>'].concat(AREAS.map(a=>`<option ${x.area===a?'selected':''}>${a}</option>`));
+      areaCell = `<select class="area-select" onclick="event.stopPropagation()" onchange="event.stopPropagation();distributeItem(${realIdx},this.value)">${opts.join('')}</select>`;
+    } else {
+      areaCell = unassigned ? `<span class="area area-unassigned">Sin distribuir</span>` : `<span class="area ${areaClass[x.area]||''}">${x.area}</span>`;
+    }
+    const rowClass = overdue ? 'row-overdue' : (dueSoon ? 'row-soon' : '');
+    let rows = `<tr class="data-row ${rowClass}" onclick="toggleDetail('${rowId}')"><td><b>${x.doc}</b>${x.file?`<div class="file-chip">${fileIcon(x.file)} ${x.file}</div>`:''}<div class="requested-by">Solicitado por Abg. ${x.owner}</div><div class="expander">${openDetail===rowId?'▴':'▾'} ${obsCount} observación${obsCount===1?'':'es'}</div></td><td>${areaCell}</td><td class="due-mono">${x.req}</td><td class="${dueClass}">${fmtDate(x.due)}${overdue?' · vencido':dueSoon?' · próximo':''}</td><td><span class="status ${classes[x.status]}"><span class="dot"></span>${labels[x.status]}</span></td><td>${x.owner}</td><td>${x.milestone}</td><td>${action}</td></tr>`;
+    if(openDetail===rowId){rows+=`<tr class="detail-row"><td colspan="8">${historyBlock(x,realIdx)}</td></tr>`}
+    return rows;
+  }).join('')}</tbody></table>`;
+}
+
+function distributeItem(realIdx,area){
+  const x=data[realIdx];
+  if(!area){toast('Selecciona un área para distribuir el requerimiento.');render();return}
+  const wasAssigned = !!x.area;
+  const previousArea = x.area;
+  x.area=area;
+  x.history=x.history||[];
+  const hh=String(TODAY.getHours()).padStart(2,'0'), mm=String(TODAY.getMinutes()).padStart(2,'0');
+  const text = wasAssigned && previousArea!==area
+    ? `Encargo redirigido de ${previousArea} al área de ${area}.`
+    : `Encargo distribuido internamente al área de ${area}.`;
+  x.history.push({date:`16/07 ${hh}:${mm}`,author:'Coordinación Cliente',text});
+  toast(wasAssigned && previousArea!==area ? `Requerimiento redirigido a ${area}.` : `Requerimiento asignado a ${area}.`);
+  render();
+}
+
+function toggleDetail(rowId){openDetail = openDetail===rowId ? null : rowId; render()}
+
+function toggleAllCases(){
+  const grid=document.getElementById('allCasesGrid');
+  const showing = grid.style.display!=='none';
+  grid.style.display = showing ? 'none' : 'grid';
+  document.getElementById('toggleAllCasesLink').textContent = showing ? 'Ver los 6 expedientes como procesos individuales ▾' : 'Ocultar vista de expedientes ▴';
+  if(!showing) renderAllCasesGrid();
+}
+function renderAllCasesGrid(){
+  const grid=document.getElementById('allCasesGrid');
+  grid.innerHTML = Object.keys(datasets).map(key=>{
+    const ds=datasets[key];
+    const items=ds.items;
+    const doneN=items.filter(i=>i.status==='done').length;
+    const pct=Math.round(doneN/items.length*100);
+    const days=daysDiff(ds.dueDate);
+    return `<div class="case-card ${key===currentCase?'current':''}" onclick="document.getElementById('caseSelect').value='${key}';switchCase('${key}');">
+      <div class="cc-exp">${ds.expediente}</div>
+      <div class="cc-name">${ds.contraparte}</div>
+      <div class="small">${ds.audienciaTipo} · ${fmtDate(ds.dueDate)} (${days>=0?days:0} días)</div>
+      <div class="cc-bar"><span style="width:${pct}%"></span></div>
+      <div class="cc-foot"><span>${doneN}/${items.length} entregado</span><span>${pct}%</span></div>
+    </div>`;
+  }).join('');
+}
+
+function render(){
+  const filtered = data.filter(matchesFilters);
+  document.getElementById('tableAll').innerHTML=table(filtered,'all');
+  document.getElementById('tableRequested').innerHTML=table(filtered.filter(x=>x.status==='requested'),'req');
+  document.getElementById('tableDelivered').innerHTML=table(filtered.filter(x=>x.status==='done'),'del');
+  document.getElementById('tablePending').innerHTML=table(filtered.filter(x=>x.status!=='done'),'pen');
+
+  const scope = currentRole==='cliente' ? data.filter(x=>x.area===clientArea) : data;
+  document.getElementById('totalCount').textContent=scope.length;
+  const doneN=scope.filter(x=>x.status==='done').length;
+  const partialN=scope.filter(x=>x.status==='partial').length;
+  const pendingN=scope.filter(x=>x.status==='pending').length;
+  const overdueN=scope.filter(x=>daysDiff(x.due)<0 && x.status!=='done').length;
+  document.getElementById('doneCount').textContent=doneN;
+  document.getElementById('doneHint').textContent=(scope.length?Math.round(doneN/scope.length*100):0)+'% del total';
+  document.getElementById('partialCount').textContent=partialN;
+  document.getElementById('pendingCount').textContent=pendingN+partialN+scope.filter(x=>x.status==='requested').length;
+  document.getElementById('pendingHint').textContent=`${overdueN} próximo(s) a vencer`;
+
+  const ds=datasets[currentCase];
+  const daysLeft=daysDiff(ds.dueDate);
+  document.getElementById('clockLabel').textContent=`Vence ${ds.audienciaTipo.toLowerCase()}`;
+  document.getElementById('clockValue').textContent=(daysLeft>=0?daysLeft:0)+' días';
+  const pct=Math.max(0,Math.min(1,daysLeft/14));
+  const circumference=2*Math.PI*19;
+  const ring=document.getElementById('clockRing');
+  ring.style.strokeDasharray=circumference;
+  ring.style.strokeDashoffset=circumference*(1-pct);
+  ring.style.stroke = daysLeft<=3 ? '#c23b3b' : daysLeft<=7 ? '#b6790a' : '#1f9d55';
+
+  const cfField=(label,value,mono)=>`<div class="cf-field"><div class="cf-label">${label}</div><div class="cf-value${mono?' mono':''}">${value}</div></div>`;
+  document.getElementById('caseMeta').innerHTML =
+    cfField('Contraparte', ds.contraparte) +
+    cfField('Materia', ds.materia) +
+    cfField('Sub-materia', ds.submateria) +
+    cfField('Vía procesal', ds.viaProcesal) +
+    cfField('Órgano jurisdiccional', ds.organo) +
+    cfField('Distrito', ds.distrito) +
+    cfField('Naturaleza representado', ds.naturaleza) +
+    cfField('Responsable V&amp;T', ds.responsable) +
+    cfField('N.° de expediente', ds.expediente, true) +
+    cfField('Fecha de audiencia', fmtDate(ds.dueDate), true) +
+    cfField('Hora de audiencia', ds.audienciaHora||'—', true) +
+    cfField('Tipo de diligencia', ds.audienciaTipo);
+
+  const overdueAreas=[...new Set(scope.filter(x=>daysDiff(x.due)<0 && x.status!=='done').map(x=>x.area))];
+  document.getElementById('alertBanner').style.display = overdueN>0 ? 'flex':'none';
+  if(overdueN>0)document.getElementById('alertText').textContent=`${overdueAreas.join(', ')} ${overdueAreas.length>1?'tienen':'tiene'} ${overdueN} requerimiento(s) vencido(s) antes de la ${ds.audienciaTipo.toLowerCase()} del ${fmtDate(ds.dueDate)}.`;
+
+  if(document.getElementById('allCasesGrid').style.display!=='none') renderAllCasesGrid();
+  renderHistoricos();
+}
+
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id))}
+
+function showSection(section){
+  document.getElementById('expedientesView').style.display = section==='expedientes' ? 'block':'none';
+  document.getElementById('kpiView').style.display = section==='kpi' ? 'block':'none';
+  document.getElementById('menuExpedientes').classList.toggle('active',section==='expedientes');
+  document.getElementById('menuKpi').classList.toggle('active',section==='kpi');
+}
+
+function switchCase(key){
+  currentCase=key;
+  currentCaseByRole[currentRole]=key;
+  data=datasets[key].items;
+  openDetail=null;
+  document.getElementById('fSearch').value='';
+  document.getElementById('fArea').value='';
+  document.getElementById('fStatus').value='';
+  render();
+  toast(`Expediente cambiado a ${datasets[key].label}`);
+}
+
+function todayISO(){return TODAY.toISOString().slice(0,10)}
+function openModal(){
+  const ds=datasets[currentCase];
+  document.getElementById('fReqDate').value=todayISO();
+  const suggested=new Date(TODAY.getTime()+5*86400000);
+  document.getElementById('fDate').value=suggested.toISOString().slice(0,10);
+  document.getElementById('modalContext').innerHTML=`Exp. ${ds.expediente} · ${ds.contraparte} vs. BCP<br>${ds.audienciaTipo} · ${fmtDate(ds.dueDate)}${ds.audienciaHora?' · '+ds.audienciaHora:''} — solicita: Abg. ${ds.responsable}`;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function addRequirement(){
+  const doc=document.getElementById('fDoc').value.trim();
+  if(!doc){toast('Ingresa el documento requerido.');return}
+  const ds=datasets[currentCase];
+  const reqDateISO=document.getElementById('fReqDate').value||todayISO();
+  const dueDateISO=document.getElementById('fDate').value;
+  if(!dueDateISO){toast('Indica para cuándo necesitas los documentos.');return}
+  data.push({doc,area:null,req:fmtDate(reqDateISO),due:dueDateISO,status:'requested',owner:ds.responsable,priority:document.getElementById('fPriority').value,milestone:document.getElementById('fMilestone').value,history:mkHistory([[`${fmtDate(reqDateISO).slice(0,5)} ${String(TODAY.getHours()).padStart(2,'0')}:${String(TODAY.getMinutes()).padStart(2,'0')}`,`Abg. ${ds.responsable}`,document.getElementById('fObs').value.trim()||`Nuevo requerimiento registrado (urgencia ${document.getElementById('fPriority').value.toLowerCase()}).`]])});
+  closeModal();document.getElementById('fDoc').value='';document.getElementById('fObs').value='';
+  render();showTab('all');
+  toast('Requerimiento enviado al cliente para su distribución interna.');
+}
+
+function sendReminder(i){toast(`Recordatorio enviado al área de ${data[i].area} sobre "${data[i].doc}".`)}
+
+function openUploadModal(i){uploadIndex=i;selectedFiles=[];document.getElementById('uploadDescription').innerHTML=`Requerimiento: <b>${data[i].doc}</b><br>Área responsable: ${data[i].area}`;document.getElementById('filePreview').innerHTML='';document.getElementById('uploadInput').value='';document.getElementById('uploadComment').value='';document.getElementById('uploadModal').classList.add('show')}
+function closeUploadModal(){document.getElementById('uploadModal').classList.remove('show')}
+function previewFiles(files){selectedFiles=[...files];document.getElementById('filePreview').innerHTML=selectedFiles.map(f=>`<div class="file-chip">${fileIcon(f.name)} ${f.name} · ${(f.size/1024).toFixed(1)} KB</div>`).join('')}
+function confirmUpload(){
+  if(!selectedFiles.length){toast('Selecciona al menos un archivo.');return}
+  const x=data[uploadIndex];
+  x.status='done';
+  x.file=selectedFiles.map(f=>f.name).join(', ');
+  const comment=document.getElementById('uploadComment').value.trim()||'Documento cargado directamente por el cliente.';
+  const hh=String(TODAY.getHours()).padStart(2,'0'), mm=String(TODAY.getMinutes()).padStart(2,'0');
+  x.history=x.history||[];
+  x.history.push({date:`16/07 ${hh}:${mm}`,author:x.area,text:comment});
+  closeUploadModal();render();
+  toast('Documento cargado y entrega registrada correctamente.');
+}
+
+render();
+</script>
+</body>
+</html>
