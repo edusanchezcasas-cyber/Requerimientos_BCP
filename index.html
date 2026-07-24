@@ -175,13 +175,15 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
 .who-client{background:var(--brass-bg);color:var(--brass)}
 .modal-context{background:#f6f7f9;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:-4px 0 14px;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
 .modal-hint{font-size:11.5px;color:var(--slate);background:var(--brass-bg);border:1px solid var(--brass-line);border-radius:8px;padding:9px 11px}
-.doc-row{border:1px solid var(--line);border-radius:9px;padding:12px;margin-bottom:10px;background:#f6f7f9}
+.doc-section-box{border:1px solid var(--line);border-radius:10px;padding:12px;background:#f6f7f9}
+.doc-row{border:1px solid var(--line-strong);border-radius:9px;padding:12px;margin-bottom:10px;background:var(--paper-raised)}
+.doc-section-box .doc-row:last-of-type{margin-bottom:12px}
 .doc-row-top{display:flex;gap:8px;align-items:flex-start}
 .doc-row select.doc-type{flex:1;border:1px solid var(--line-strong);border-radius:8px;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink);background:var(--paper-raised)}
 .doc-row input.doc-custom{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink);margin-top:8px}
 .doc-row textarea.doc-comment{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;font-family:var(--sans);font-size:12.5px;color:var(--ink);margin-top:8px;resize:vertical}
 .doc-row .rm-doc{border:1px solid var(--line-strong);background:var(--paper-raised);color:var(--slate);border-radius:8px;width:34px;height:36px;cursor:pointer;font-size:15px;flex-shrink:0}
-.doc-witness-global{display:flex;align-items:center;gap:14px;margin-top:12px;font-size:13px;color:var(--ink);font-weight:600}
+.doc-witness-global{display:flex;align-items:center;gap:14px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line-strong);font-size:13px;color:var(--ink);font-weight:600}
 .doc-witness-global label{display:flex;align-items:center;gap:5px;font-weight:500;color:var(--slate);cursor:pointer}
 .autocomplete-wrap{position:relative}
 .case-suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--paper-raised);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(20,20,40,.14);max-height:260px;overflow-y:auto;z-index:30}
@@ -386,11 +388,13 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
   <div class="field full"><label>Hito procesal</label><select id="fMilestone"><option>Contestación de demanda</option><option>Audiencia de conciliación</option><option>Audiencia de juzgamiento</option><option>Audiencia Única</option></select></div>
   <div class="field full">
     <label>Documentos o información requerida</label>
-    <div id="docList"></div>
-    <span class="link" onclick="addDocRow()">+ Agregar otro documento</span>
-    <div class="doc-witness-global">¿Se incluirán testigos?
-      <label><input type="radio" name="witnessGlobal" value="No" checked> No</label>
-      <label><input type="radio" name="witnessGlobal" value="Sí"> Sí</label>
+    <div class="doc-section-box">
+      <div id="docList"></div>
+      <span class="link" onclick="addDocRow()">+ Agregar otro documento</span>
+      <div class="doc-witness-global">¿Se incluirán testigos?
+        <label><input type="radio" name="witnessGlobal" value="No" checked> No</label>
+        <label><input type="radio" name="witnessGlobal" value="Sí"> Sí</label>
+      </div>
     </div>
   </div>
   <div class="field full"><div class="modal-hint">El cliente recibirá este encargo cuando lo envíes desde la pestaña "Solicitado" — el abogado no asigna el área.</div></div>
@@ -565,9 +569,10 @@ function updateDebeMenu(){
   const isCoordinador = currentRole==='cliente' && clientArea==='__coordinador__';
   document.getElementById('menuDebe').style.display = (isAbogado||isCoordinador) ? 'flex':'none';
   document.getElementById('menuDebeIcon').textContent = '📋';
-  document.getElementById('menuDebeLabel').textContent = 'Status de entrega de información';
-  document.getElementById('debeTitle').textContent = 'Status de entrega de información';
+  document.getElementById('menuDebeLabel').textContent = isAbogado ? 'Status de entrega de información' : 'Status de entrega de información por área';
+  document.getElementById('debeTitle').textContent = isAbogado ? 'Status de entrega de información' : 'Status de entrega de información por área';
   document.getElementById('debeSubtitle').textContent = isAbogado ? 'Todo lo pendiente de entrega en los 6 expedientes, sin importar el proceso' : 'Seguimiento de lo que cada área interna tiene pendiente de entregar, en todos los expedientes';
+  renderGlobalPending();
 }
 
 function fmtDate(iso){const [y,m,d]=iso.split('-');return `${d}/${m}/${y}`}
@@ -815,7 +820,8 @@ function renderGlobalPending(){
   });
   rows.sort((a,b)=>daysDiff(a.x.due)-daysDiff(b.x.due));
   if(!rows.length){host.innerHTML='<div class="empty-state">No hay documentos pendientes de entrega en ningún expediente. 🎉</div>';return}
-  host.innerHTML=`<table class="req-table"><thead><tr><th>Expediente</th><th>Información requerida</th><th>Área</th><th>Fecha límite</th><th>Estado</th><th>Abogado V&T</th></tr></thead><tbody>${rows.map(r=>{
+  const showLawyerCol = currentRole==='abogado';
+  host.innerHTML=`<table class="req-table"><thead><tr><th>Expediente</th><th>Información requerida</th><th>Área</th><th>Fecha límite</th><th>Estado</th>${showLawyerCol?'<th>Abogado V&T</th>':''}</tr></thead><tbody>${rows.map(r=>{
     const dd=daysDiff(r.x.due);
     const overdue=dd<0;
     const dueSoon=!overdue && dd<=2;
@@ -827,7 +833,7 @@ function renderGlobalPending(){
       <td>${areaCell}</td>
       <td class="${overdue?'critical':'due-mono'}">${fmtDate(r.x.due)}${overdue?' · vencido':dueSoon?' · próximo':''}</td>
       <td><span class="status ${classes[r.x.status]}"><span class="dot"></span>${labels[r.x.status]}</span></td>
-      <td>${r.x.owner}</td>
+      ${showLawyerCol?`<td>${r.x.owner}</td>`:''}
     </tr>`;
   }).join('')}</tbody></table>`;
 }
@@ -869,6 +875,12 @@ function onDocTypeChange(id){
 function addDocRow(){
   docRowCount++;
   document.getElementById('docList').insertAdjacentHTML('beforeend', docRowHtml(docRowCount));
+  const newRow=document.getElementById('docRow'+docRowCount);
+  if(newRow){
+    if(newRow.scrollIntoView) newRow.scrollIntoView({behavior:'smooth',block:'center'});
+    const sel=document.getElementById('docType'+docRowCount);
+    if(sel && sel.focus) sel.focus();
+  }
 }
 function removeDocRow(id){
   const el=document.getElementById('docRow'+id);
