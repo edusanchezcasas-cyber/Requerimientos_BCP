@@ -175,10 +175,16 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
 .who-client{background:var(--brass-bg);color:var(--brass)}
 .modal-context{background:#f6f7f9;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:-4px 0 14px;font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
 .modal-hint{font-size:11.5px;color:var(--slate);background:var(--brass-bg);border:1px solid var(--brass-line);border-radius:8px;padding:9px 11px}
-.doc-row{display:flex;gap:8px;margin-bottom:8px}
-.doc-row input{flex:1;border:1px solid var(--line-strong);border-radius:8px;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink)}
-.doc-row .rm-doc{border:1px solid var(--line-strong);background:var(--paper-raised);color:var(--slate);border-radius:8px;width:34px;cursor:pointer;font-size:15px}
+.doc-row{border:1px solid var(--line);border-radius:9px;padding:12px;margin-bottom:10px;background:#f6f7f9}
+.doc-row-top{display:flex;gap:8px;align-items:flex-start}
+.doc-row select.doc-type{flex:1;border:1px solid var(--line-strong);border-radius:8px;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink);background:var(--paper-raised)}
+.doc-row input.doc-custom{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink);margin-top:8px}
+.doc-row textarea.doc-comment{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;font-family:var(--sans);font-size:12.5px;color:var(--ink);margin-top:8px;resize:vertical}
+.doc-row .rm-doc{border:1px solid var(--line-strong);background:var(--paper-raised);color:var(--slate);border-radius:8px;width:34px;height:36px;cursor:pointer;font-size:15px;flex-shrink:0}
+.doc-row .doc-witness{display:flex;align-items:center;gap:14px;margin-top:8px;font-size:12px;color:var(--slate)}
+.doc-row .doc-witness label{display:flex;align-items:center;gap:5px;font-weight:500;cursor:pointer}
 .draft-badge{display:inline-block;font-size:9.5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-line);border-radius:5px;padding:1px 6px;margin-left:6px}
+.witness-badge{display:inline-block;font-size:9.5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-line);border-radius:5px;padding:1px 6px;margin-left:6px}
 .send-bar{display:flex;align-items:center;gap:10px;background:var(--blue-bg);border:1px solid var(--blue-line);border-radius:10px;padding:9px 14px;margin-bottom:12px}
 .send-bar b{color:var(--blue)}
 .draft-check{width:15px;height:15px;cursor:pointer;accent-color:var(--gold)}
@@ -256,11 +262,12 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
         <option value="__coordinador__">Coordinación (recibe encargos)</option>
         <option>Recursos Humanos</option><option>Planillas</option><option>Legal Interno</option><option>Operaciones</option>
       </select>
-      <button class="btn btn-primary" id="newReqBtn" onclick="openModal()">+ Nuevo requerimiento</button>
+      <button class="btn btn-primary" id="newReqBtn" onclick="openModal(true)">+ Nuevo requerimiento</button>
     </div>
   </div>
   <nav class="topnav">
     <div class="topnav-item active" id="menuExpedientes" onclick="showSection('expedientes')">📁 Expedientes <span class="badge">6</span></div>
+    <div class="topnav-item" id="menuDebe" onclick="showSection('debe')">🔔 Debe el cliente</div>
     <div class="topnav-item" id="menuKpi" onclick="showSection('kpi')">📊 KPI</div>
   </nav>
 </header>
@@ -311,7 +318,7 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
         <select id="fArea" onchange="render()" style="display:inline-block"><option value="">Todas las áreas</option><option>Recursos Humanos</option><option>Planillas</option><option>Legal Interno</option><option>Operaciones</option></select>
         <select id="fStatus" onchange="render()"><option value="">Todos los estados</option><option value="falta">Falta por entregar (todo)</option><option value="requested">Solicitado</option><option value="pending">Pendiente</option><option value="partial">Parcial</option><option value="done">Entregado</option></select>
       </div>
-      <button class="btn btn-teal btn-sm" id="addReqToolbarBtn" onclick="openModal()">Agregar requerimiento</button>
+      <button class="btn btn-teal btn-sm" id="addReqToolbarBtn" onclick="openModal(false)">Agregar requerimiento</button>
     </div>
     <div id="tableAll"></div>
   </section>
@@ -340,12 +347,28 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
     <div class="chart-card"><strong>Trazabilidad del expediente activo</strong><div class="timeline" style="margin-top:18px"><div class="event"><strong>Demanda notificada</strong><p>10/07/2026 · 09:15</p></div><div class="event"><strong>Requerimientos enviados</strong><p>10/07/2026 · 11:40 · Abg. Alessandra Zegarra</p></div><div class="event"><strong>Primer documento recibido</strong><p>11/07/2026 · 16:05 · Planillas</p></div><div class="event"><strong>Recordatorio automático</strong><p>13/07/2026 · 08:00 · 4 pendientes</p></div><div class="event"><strong>Fecha límite interna</strong><p>17/07/2026 · 18:00</p></div></div></div>
   </div>
 </div>
+
+<div id="debeView" style="display:none">
+  <div class="topbar"><div><h2>Qué nos debe el cliente</h2><p>Todo lo pendiente de entrega en los 6 expedientes, sin importar el proceso</p></div></div>
+  <div class="toolbar">
+    <div class="filters">
+      <input id="debeSearch" placeholder="Buscar documento..." oninput="renderGlobalPending()">
+      <select id="debeArea" onchange="renderGlobalPending()"><option value="">Todas las áreas</option><option>Recursos Humanos</option><option>Planillas</option><option>Legal Interno</option><option>Operaciones</option></select>
+    </div>
+  </div>
+  <div id="debeTable"></div>
+</div>
 </main>
 </div>
 
 <div class="modal" id="modal"><div class="modal-box"><h3>Nuevo requerimiento de información</h3>
+  <div class="field full" id="modalSearchWrap" style="display:none;margin-bottom:14px">
+    <label>Buscar expediente</label>
+    <input id="modalCaseSearch" list="expedienteDatalist" placeholder="Escribe el N° de expediente o el nombre de la contraparte..." oninput="onModalCaseSearch(this.value)">
+    <datalist id="expedienteDatalist"></datalist>
+  </div>
   <div class="modal-context" id="modalContext"></div>
-  <div class="form-grid">
+  <div class="form-grid" id="modalFormBody">
   <div class="field"><label>Fecha de requerimiento</label><input id="fReqDate" type="date" disabled></div>
   <div class="field"><label>¿Para cuándo necesita los documentos?</label><input id="fDate" type="date"></div>
   <div class="field full"><label>Hito procesal</label><select id="fMilestone"><option>Contestación de demanda</option><option>Audiencia de conciliación</option><option>Audiencia de juzgamiento</option><option>Audiencia Única</option></select></div>
@@ -354,7 +377,6 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
     <div id="docList"></div>
     <span class="link" onclick="addDocRow()">+ Agregar otro documento</span>
   </div>
-  <div class="field full"><label>Observaciones</label><textarea id="fObs" rows="3" placeholder="Detalle del formato, periodo o validación necesaria"></textarea></div>
   <div class="field full"><div class="modal-hint">El cliente recibirá este encargo cuando lo envíes desde la pestaña "Solicitado" — el abogado no asigna el área.</div></div>
 </div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-teal" onclick="addRequirement()">Guardar</button></div></div></div>
 
@@ -499,6 +521,8 @@ function setRole(role){
   document.getElementById('fArea').style.display = role==='cliente'?'none':'inline-block';
   document.getElementById('newReqBtn').style.display = role==='abogado'?'inline-block':'none';
   const toolbarBtn=document.getElementById('addReqToolbarBtn'); if(toolbarBtn) toolbarBtn.style.display = role==='abogado'?'inline-block':'none';
+  document.getElementById('menuDebe').style.display = role==='abogado'?'flex':'none';
+  if(role==='cliente' && document.getElementById('debeView').style.display!=='none') showSection('expedientes');
   document.getElementById('fSearch').value='';
   document.getElementById('fArea').value='';
   document.getElementById('fStatus').value='';
@@ -620,7 +644,7 @@ function table(items,tabId){
     }
     const rowClass = overdue ? 'row-overdue' : (dueSoon ? 'row-soon' : '');
     const delBtn = currentRole==='abogado' ? `<button class="del-btn" onclick="event.stopPropagation();deleteRequirement(${realIdx})" title="Eliminar requerimiento">🗑</button>` : '';
-    let rows = `<tr class="data-row ${rowClass}" onclick="toggleDetail('${rowId}')"><td>${isDraft?`<input type="checkbox" class="draft-check" onclick="event.stopPropagation()" onchange="toggleDraftSelect(${realIdx},this.checked)" ${draftSelection.has(x)?'checked':''}> `:''}<b>${x.doc}</b>${isDraft?'<span class="draft-badge">Borrador</span>':''}${x.file?`<div class="file-chip">${fileIcon(x.file)} ${x.file}</div>`:''}<div class="requested-by">Solicitado por Abg. ${x.owner}</div><div class="expander">${openDetail===rowId?'▴':'▾'} ${obsCount} observación${obsCount===1?'':'es'}</div></td><td>${areaCell}</td><td class="due-mono">${x.req}</td><td class="${dueClass}">${fmtDate(x.due)}${overdue?' · vencido':dueSoon?' · próximo':''}</td><td><span class="status ${classes[x.status]}"><span class="dot"></span>${labels[x.status]}</span></td><td>${x.owner}</td><td>${x.milestone}</td><td><div class="action-cell">${action}${delBtn}</div></td></tr>`;
+    let rows = `<tr class="data-row ${rowClass}" onclick="toggleDetail('${rowId}')"><td>${isDraft?`<input type="checkbox" class="draft-check" onclick="event.stopPropagation()" onchange="toggleDraftSelect(${realIdx},this.checked)" ${draftSelection.has(x)?'checked':''}> `:''}<b>${x.doc}</b>${isDraft?'<span class="draft-badge">Borrador</span>':''}${x.testigo==='Sí'?'<span class="witness-badge">Testigo</span>':''}${x.file?`<div class="file-chip">${fileIcon(x.file)} ${x.file}</div>`:''}<div class="requested-by">Solicitado por Abg. ${x.owner}</div><div class="expander">${openDetail===rowId?'▴':'▾'} ${obsCount} observación${obsCount===1?'':'es'}</div></td><td>${areaCell}</td><td class="due-mono">${x.req}</td><td class="${dueClass}">${fmtDate(x.due)}${overdue?' · vencido':dueSoon?' · próximo':''}</td><td><span class="status ${classes[x.status]}"><span class="dot"></span>${labels[x.status]}</span></td><td>${x.owner}</td><td>${x.milestone}</td><td><div class="action-cell">${action}${delBtn}</div></td></tr>`;
     if(openDetail===rowId){rows+=`<tr class="detail-row"><td colspan="8">${historyBlock(x,realIdx)}</td></tr>`}
     return rows;
   }).join('')}</tbody></table>`;
@@ -676,7 +700,9 @@ function render(){
   document.getElementById('tableDelivered').innerHTML=table(filtered.filter(x=>x.status==='done'),'del');
   document.getElementById('tablePending').innerHTML=table(filtered.filter(x=>x.status!=='done'),'pen');
 
-  const scope = currentRole==='cliente' ? data.filter(x=>x.area===clientArea) : data;
+  const scope = currentRole==='cliente'
+    ? data.filter(x=>x.sent!==false && (clientArea==='__coordinador__' || x.area===clientArea))
+    : data;
   document.getElementById('totalCount').textContent=scope.length;
   const doneN=scope.filter(x=>x.status==='done').length;
   const partialN=scope.filter(x=>x.status==='partial').length;
@@ -727,9 +753,47 @@ function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.to
 
 function showSection(section){
   document.getElementById('expedientesView').style.display = section==='expedientes' ? 'block':'none';
+  document.getElementById('debeView').style.display = section==='debe' ? 'block':'none';
   document.getElementById('kpiView').style.display = section==='kpi' ? 'block':'none';
   document.getElementById('menuExpedientes').classList.toggle('active',section==='expedientes');
+  document.getElementById('menuDebe').classList.toggle('active',section==='debe');
   document.getElementById('menuKpi').classList.toggle('active',section==='kpi');
+  if(section==='debe') renderGlobalPending();
+}
+
+function renderGlobalPending(){
+  const host=document.getElementById('debeTable');
+  if(!host)return;
+  const q=(document.getElementById('debeSearch')?.value||'').toLowerCase().trim();
+  const area=document.getElementById('debeArea')?.value||'';
+  let rows=[];
+  Object.keys(datasets).forEach(key=>{
+    const ds=datasets[key];
+    ds.items.forEach((x,idx)=>{
+      if(x.status==='done')return;
+      if(x.sent===false)return;
+      if(q && !x.doc.toLowerCase().includes(q))return;
+      if(area && x.area!==area)return;
+      rows.push({x,key,ds,idx});
+    });
+  });
+  rows.sort((a,b)=>daysDiff(a.x.due)-daysDiff(b.x.due));
+  if(!rows.length){host.innerHTML='<div class="empty-state">No hay documentos pendientes de entrega en ningún expediente. 🎉</div>';return}
+  host.innerHTML=`<table class="req-table"><thead><tr><th>Expediente</th><th>Información requerida</th><th>Área</th><th>Fecha límite</th><th>Estado</th><th>Abogado V&T</th></tr></thead><tbody>${rows.map(r=>{
+    const dd=daysDiff(r.x.due);
+    const overdue=dd<0;
+    const dueSoon=!overdue && dd<=2;
+    const rowClass = overdue?'row-overdue':(dueSoon?'row-soon':'');
+    const areaCell = r.x.area ? `<span class="area ${areaClass[r.x.area]||''}">${r.x.area}</span>` : `<span class="area area-unassigned">Sin distribuir</span>`;
+    return `<tr class="data-row ${rowClass}" onclick="document.getElementById('caseSelect').value='${r.key}';switchCase('${r.key}');showSection('expedientes');showTab('all');">
+      <td class="due-mono">${r.ds.expediente}<div class="small">${r.ds.contraparte}</div></td>
+      <td><b>${r.x.doc}</b></td>
+      <td>${areaCell}</td>
+      <td class="${overdue?'critical':'due-mono'}">${fmtDate(r.x.due)}${overdue?' · vencido':dueSoon?' · próximo':''}</td>
+      <td><span class="status ${classes[r.x.status]}"><span class="dot"></span>${labels[r.x.status]}</span></td>
+      <td>${r.x.owner}</td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
 }
 
 function switchCase(key){
@@ -746,9 +810,28 @@ function switchCase(key){
 }
 
 function todayISO(){return TODAY.toISOString().slice(0,10)}
+const DOC_TYPES=['Boletas de pago','DNI / Documento de identidad','Contrato de trabajo','Carta de despido','Informe de jefatura','Liquidación de beneficios sociales','Constancia de trabajo','Control de asistencia y marcaciones','Correos electrónicos','Declaración jurada','Otro (especificar)'];
 let docRowCount=0;
+let modalTargetCase=null;
 function docRowHtml(id){
-  return `<div class="doc-row" id="docRow${id}"><input id="docInput${id}" placeholder="Ej.: Boletas de pago de enero a junio de 2026"><button type="button" class="rm-doc" onclick="removeDocRow(${id})" title="Quitar">×</button></div>`;
+  const opts = DOC_TYPES.map(t=>`<option>${t}</option>`).join('');
+  return `<div class="doc-row" id="docRow${id}">
+    <div class="doc-row-top">
+      <select class="doc-type" id="docType${id}" onchange="onDocTypeChange(${id})">${opts}</select>
+      <button type="button" class="rm-doc" onclick="removeDocRow(${id})" title="Quitar">×</button>
+    </div>
+    <input class="doc-custom" id="docCustom${id}" placeholder="Especifica el documento..." style="display:none">
+    <textarea class="doc-comment" id="docComment${id}" rows="2" placeholder="Comentario u observación (formato, periodo, validación necesaria)..."></textarea>
+    <div class="doc-witness">¿Es testigo?
+      <label><input type="radio" name="witness${id}" value="No" checked> No</label>
+      <label><input type="radio" name="witness${id}" value="Sí"> Sí</label>
+    </div>
+  </div>`;
+}
+function onDocTypeChange(id){
+  const sel=document.getElementById('docType'+id);
+  const custom=document.getElementById('docCustom'+id);
+  custom.style.display = sel.value.startsWith('Otro') ? 'block' : 'none';
 }
 function addDocRow(){
   docRowCount++;
@@ -759,35 +842,79 @@ function removeDocRow(id){
   if(document.querySelectorAll('#docList .doc-row').length<=1){toast('Debe quedar al menos un documento.');return}
   if(el) el.remove();
 }
-function openModal(){
-  const ds=datasets[currentCase];
+function fillModalContext(key){
+  const ds=datasets[key];
+  document.getElementById('modalContext').innerHTML=`Exp. ${ds.expediente} · ${ds.contraparte} vs. BCP<br>${ds.audienciaTipo} · ${fmtDate(ds.dueDate)}${ds.audienciaHora?' · '+ds.audienciaHora:''} — solicita: Abg. ${ds.responsable}`;
+}
+function onModalCaseSearch(value){
+  const v=value.trim().toLowerCase();
+  const found=Object.keys(datasets).find(k=>{
+    const d=datasets[k];
+    return `Exp. ${d.expediente} — ${d.contraparte}`.toLowerCase()===v;
+  });
+  if(found){
+    modalTargetCase=found;
+    fillModalContext(found);
+    document.getElementById('modalFormBody').style.opacity='1';
+    document.getElementById('modalFormBody').style.pointerEvents='auto';
+  } else {
+    modalTargetCase=null;
+    document.getElementById('modalContext').innerHTML='Selecciona un expediente de la lista para continuar.';
+    document.getElementById('modalFormBody').style.opacity='.4';
+    document.getElementById('modalFormBody').style.pointerEvents='none';
+  }
+}
+function openModal(global){
+  modalTargetCase = global ? null : currentCase;
+  document.getElementById('modalSearchWrap').style.display = global ? 'block' : 'none';
+  document.getElementById('modalFormBody').style.opacity='1';
+  if(global){
+    document.getElementById('modalCaseSearch').value='';
+    document.getElementById('expedienteDatalist').innerHTML=Object.keys(datasets).map(k=>{
+      const d=datasets[k];
+      return `<option value="Exp. ${d.expediente} — ${d.contraparte}">`;
+    }).join('');
+    document.getElementById('modalContext').innerHTML='Selecciona un expediente de la lista para continuar.';
+    document.getElementById('modalFormBody').style.opacity='.4';
+    document.getElementById('modalFormBody').style.pointerEvents='none';
+  } else {
+    fillModalContext(currentCase);
+    document.getElementById('modalFormBody').style.pointerEvents='auto';
+  }
   document.getElementById('fReqDate').value=todayISO();
   const suggested=new Date(TODAY.getTime()+5*86400000);
   document.getElementById('fDate').value=suggested.toISOString().slice(0,10);
-  document.getElementById('modalContext').innerHTML=`Exp. ${ds.expediente} · ${ds.contraparte} vs. BCP<br>${ds.audienciaTipo} · ${fmtDate(ds.dueDate)}${ds.audienciaHora?' · '+ds.audienciaHora:''} — solicita: Abg. ${ds.responsable}`;
   docRowCount=0;
   document.getElementById('docList').innerHTML='';
   addDocRow();
-  document.getElementById('fObs').value='';
   document.getElementById('modal').classList.add('show');
 }
 function closeModal(){document.getElementById('modal').classList.remove('show')}
 function addRequirement(){
-  const ds=datasets[currentCase];
+  if(!modalTargetCase){toast('Selecciona el expediente para el que es este requerimiento.');return}
+  const ds=datasets[modalTargetCase];
+  const targetItems=ds.items;
   const reqDateISO=document.getElementById('fReqDate').value||todayISO();
   const dueDateISO=document.getElementById('fDate').value;
   if(!dueDateISO){toast('Indica para cuándo necesitas los documentos.');return}
-  const inputs=[...document.querySelectorAll('#docList .doc-row input')];
-  const docs=inputs.map(i=>i.value.trim()).filter(Boolean);
-  if(!docs.length){toast('Ingresa al menos un documento requerido.');return}
-  const obs=document.getElementById('fObs').value.trim();
   const milestone=document.getElementById('fMilestone').value;
-  docs.forEach(doc=>{
-    data.push({doc,area:null,req:fmtDate(reqDateISO),due:dueDateISO,status:'requested',owner:ds.responsable,sent:false,milestone,history:mkHistory([[`${fmtDate(reqDateISO).slice(0,5)} ${String(TODAY.getHours()).padStart(2,'0')}:${String(TODAY.getMinutes()).padStart(2,'0')}`,`Abg. ${ds.responsable}`,obs||'Documento registrado internamente, pendiente de envío al cliente.']])});
+  const rows=[...document.querySelectorAll('#docList .doc-row')];
+  let count=0;
+  rows.forEach(row=>{
+    const id=row.id.replace('docRow','');
+    const typeSel=document.getElementById('docType'+id).value;
+    const custom=document.getElementById('docCustom'+id).value.trim();
+    const doc = typeSel.startsWith('Otro') ? (custom||'Otro documento') : typeSel;
+    const comment=document.getElementById('docComment'+id).value.trim();
+    const witness=document.querySelector(`input[name="witness${id}"]:checked`).value;
+    count++;
+    targetItems.push({doc,area:null,req:fmtDate(reqDateISO),due:dueDateISO,status:'requested',owner:ds.responsable,sent:false,testigo:witness,milestone,history:mkHistory([[`${fmtDate(reqDateISO).slice(0,5)} ${String(TODAY.getHours()).padStart(2,'0')}:${String(TODAY.getMinutes()).padStart(2,'0')}`,`Abg. ${ds.responsable}`,comment||'Documento registrado internamente, pendiente de envío al cliente.']])});
   });
+  const wasOtherCase = modalTargetCase!==currentCase;
   closeModal();
+  if(wasOtherCase){ switchCase(modalTargetCase); document.getElementById('caseSelect').value=modalTargetCase; }
   render();showTab('requested');
-  toast(`${docs.length} documento(s) guardado(s) como borrador. Selecciónalos en "Solicitado" para enviarlos al cliente.`);
+  toast(`${count} documento(s) guardado(s) como borrador en Exp. ${ds.expediente}. Selecciónalos en "Solicitado" para enviarlos al cliente.`);
 }
 
 function toggleDraftSelect(realIdx,checked){
