@@ -181,7 +181,8 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
 .doc-row input.doc-custom{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:9px 10px;font-family:var(--sans);font-size:13.5px;color:var(--ink);margin-top:8px}
 .doc-row textarea.doc-comment{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;font-family:var(--sans);font-size:12.5px;color:var(--ink);margin-top:8px;resize:vertical}
 .doc-row .rm-doc{border:1px solid var(--line-strong);background:var(--paper-raised);color:var(--slate);border-radius:8px;width:34px;height:36px;cursor:pointer;font-size:15px;flex-shrink:0}
-.doc-row .doc-witness{display:flex;align-items:center;gap:14px;margin-top:8px;font-size:12px;color:var(--slate)}
+.doc-witness-global{display:flex;align-items:center;gap:14px;margin-top:12px;font-size:13px;color:var(--ink);font-weight:600}
+.doc-witness-global label{display:flex;align-items:center;gap:5px;font-weight:500;color:var(--slate);cursor:pointer}
 .autocomplete-wrap{position:relative}
 .case-suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--paper-raised);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(20,20,40,.14);max-height:260px;overflow-y:auto;z-index:30}
 .case-suggestions .cs-item{padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
@@ -190,7 +191,6 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
 .case-suggestions .cs-item b{font-family:var(--mono);font-size:12px;color:var(--ink);font-variant-numeric:tabular-nums}
 .case-suggestions .cs-item span{font-size:12px;color:var(--slate)}
 .case-suggestions .cs-empty{padding:14px;font-size:12.5px;color:var(--slate-soft);text-align:center}
-.doc-row .doc-witness label{display:flex;align-items:center;gap:5px;font-weight:500;cursor:pointer}
 .draft-badge{display:inline-block;font-size:9.5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-line);border-radius:5px;padding:1px 6px;margin-left:6px}
 .witness-badge{display:inline-block;font-size:9.5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-line);border-radius:5px;padding:1px 6px;margin-left:6px}
 .send-bar{display:flex;align-items:center;gap:10px;background:var(--blue-bg);border:1px solid var(--blue-line);border-radius:10px;padding:9px 14px;margin-bottom:12px}
@@ -388,6 +388,10 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
     <label>Documentos o información requerida</label>
     <div id="docList"></div>
     <span class="link" onclick="addDocRow()">+ Agregar otro documento</span>
+    <div class="doc-witness-global">¿Se incluirán testigos?
+      <label><input type="radio" name="witnessGlobal" value="No" checked> No</label>
+      <label><input type="radio" name="witnessGlobal" value="Sí"> Sí</label>
+    </div>
   </div>
   <div class="field full"><div class="modal-hint">El cliente recibirá este encargo cuando lo envíes desde la pestaña "Solicitado" — el abogado no asigna el área.</div></div>
 </div><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-teal" onclick="addRequirement()">Guardar</button></div></div></div>
@@ -560,9 +564,9 @@ function updateDebeMenu(){
   const isAbogado = currentRole==='abogado';
   const isCoordinador = currentRole==='cliente' && clientArea==='__coordinador__';
   document.getElementById('menuDebe').style.display = (isAbogado||isCoordinador) ? 'flex':'none';
-  document.getElementById('menuDebeIcon').textContent = isAbogado ? '🔔' : '📋';
-  document.getElementById('menuDebeLabel').textContent = isAbogado ? 'Debe el cliente' : 'Status de entrega de información por área';
-  document.getElementById('debeTitle').textContent = isAbogado ? 'Qué nos debe el cliente' : 'Status de entrega de información por área';
+  document.getElementById('menuDebeIcon').textContent = '📋';
+  document.getElementById('menuDebeLabel').textContent = 'Status de entrega de información';
+  document.getElementById('debeTitle').textContent = 'Status de entrega de información';
   document.getElementById('debeSubtitle').textContent = isAbogado ? 'Todo lo pendiente de entrega en los 6 expedientes, sin importar el proceso' : 'Seguimiento de lo que cada área interna tiene pendiente de entregar, en todos los expedientes';
 }
 
@@ -855,10 +859,6 @@ function docRowHtml(id){
     </div>
     <input class="doc-custom" id="docCustom${id}" placeholder="Especifica el documento..." style="display:none">
     <textarea class="doc-comment" id="docComment${id}" rows="2" placeholder="Comentario u observación (formato, periodo, validación necesaria)..."></textarea>
-    <div class="doc-witness">¿Es testigo?
-      <label><input type="radio" name="witness${id}" value="No" checked> No</label>
-      <label><input type="radio" name="witness${id}" value="Sí"> Sí</label>
-    </div>
   </div>`;
 }
 function onDocTypeChange(id){
@@ -936,6 +936,7 @@ function openModal(global){
   docRowCount=0;
   document.getElementById('docList').innerHTML='';
   addDocRow();
+  const wNo=document.querySelector('input[name="witnessGlobal"][value="No"]'); if(wNo) wNo.checked=true;
   document.getElementById('modal').classList.add('show');
 }
 function closeModal(){document.getElementById('modal').classList.remove('show');hideCaseSuggestions();}
@@ -947,6 +948,7 @@ function addRequirement(){
   const dueDateISO=document.getElementById('fDate').value;
   if(!dueDateISO){toast('Indica para cuándo necesitas los documentos.');return}
   const milestone=document.getElementById('fMilestone').value;
+  const witness=document.querySelector('input[name="witnessGlobal"]:checked').value;
   const rows=[...document.querySelectorAll('#docList .doc-row')];
   let count=0;
   rows.forEach(row=>{
@@ -955,7 +957,6 @@ function addRequirement(){
     const custom=document.getElementById('docCustom'+id).value.trim();
     const doc = typeSel.startsWith('Otro') ? (custom||'Otro documento') : typeSel;
     const comment=document.getElementById('docComment'+id).value.trim();
-    const witness=document.querySelector(`input[name="witness${id}"]:checked`).value;
     count++;
     targetItems.push({doc,area:null,req:fmtDate(reqDateISO),due:dueDateISO,status:'requested',owner:ds.responsable,sent:false,testigo:witness,milestone,history:mkHistory([[`${fmtDate(reqDateISO).slice(0,5)} ${String(TODAY.getHours()).padStart(2,'0')}:${String(TODAY.getMinutes()).padStart(2,'0')}`,`Abg. ${ds.responsable}`,comment||'Documento registrado internamente, pendiente de envío al cliente.']])});
   });
