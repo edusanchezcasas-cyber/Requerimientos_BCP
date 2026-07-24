@@ -182,6 +182,14 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
 .doc-row textarea.doc-comment{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;font-family:var(--sans);font-size:12.5px;color:var(--ink);margin-top:8px;resize:vertical}
 .doc-row .rm-doc{border:1px solid var(--line-strong);background:var(--paper-raised);color:var(--slate);border-radius:8px;width:34px;height:36px;cursor:pointer;font-size:15px;flex-shrink:0}
 .doc-row .doc-witness{display:flex;align-items:center;gap:14px;margin-top:8px;font-size:12px;color:var(--slate)}
+.autocomplete-wrap{position:relative}
+.case-suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--paper-raised);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(20,20,40,.14);max-height:260px;overflow-y:auto;z-index:30}
+.case-suggestions .cs-item{padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.case-suggestions .cs-item:last-child{border-bottom:0}
+.case-suggestions .cs-item:hover{background:var(--paper)}
+.case-suggestions .cs-item b{font-family:var(--mono);font-size:12px;color:var(--ink);font-variant-numeric:tabular-nums}
+.case-suggestions .cs-item span{font-size:12px;color:var(--slate)}
+.case-suggestions .cs-empty{padding:14px;font-size:12.5px;color:var(--slate-soft);text-align:center}
 .doc-row .doc-witness label{display:flex;align-items:center;gap:5px;font-weight:500;cursor:pointer}
 .draft-badge{display:inline-block;font-size:9.5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-line);border-radius:5px;padding:1px 6px;margin-left:6px}
 .witness-badge{display:inline-block;font-size:9.5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-line);border-radius:5px;padding:1px 6px;margin-left:6px}
@@ -267,7 +275,7 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
   </div>
   <nav class="topnav">
     <div class="topnav-item active" id="menuExpedientes" onclick="showSection('expedientes')">📁 Expedientes <span class="badge">6</span></div>
-    <div class="topnav-item" id="menuDebe" onclick="showSection('debe')">🔔 Debe el cliente</div>
+    <div class="topnav-item" id="menuDebe" onclick="showSection('debe')"><span id="menuDebeIcon">🔔</span> <span id="menuDebeLabel">Debe el cliente</span></div>
     <div class="topnav-item" id="menuKpi" onclick="showSection('kpi')">📊 KPI</div>
   </nav>
 </header>
@@ -349,11 +357,13 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
 </div>
 
 <div id="debeView" style="display:none">
-  <div class="topbar"><div><h2>Qué nos debe el cliente</h2><p>Todo lo pendiente de entrega en los 6 expedientes, sin importar el proceso</p></div></div>
+  <div class="topbar"><div><h2 id="debeTitle">Qué nos debe el cliente</h2><p id="debeSubtitle">Todo lo pendiente de entrega en los 6 expedientes, sin importar el proceso</p></div></div>
   <div class="toolbar">
     <div class="filters">
       <input id="debeSearch" placeholder="Buscar documento..." oninput="renderGlobalPending()">
       <select id="debeArea" onchange="renderGlobalPending()"><option value="">Todas las áreas</option><option>Recursos Humanos</option><option>Planillas</option><option>Legal Interno</option><option>Operaciones</option></select>
+      <select id="debeEstado" onchange="renderGlobalPending()"><option value="">Todos los estados</option><option value="requested">Solicitado</option><option value="pending">Pendiente</option><option value="partial">Parcial</option></select>
+      <select id="debeFecha" onchange="renderGlobalPending()"><option value="">Todas las fechas</option><option value="vencido">Vencidos</option><option value="proximo">Próximos 3 días</option><option value="semana">Próximos 7 días</option></select>
     </div>
   </div>
   <div id="debeTable"></div>
@@ -364,8 +374,10 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
 <div class="modal" id="modal"><div class="modal-box"><h3>Nuevo requerimiento de información</h3>
   <div class="field full" id="modalSearchWrap" style="display:none;margin-bottom:14px">
     <label>Buscar expediente</label>
-    <input id="modalCaseSearch" list="expedienteDatalist" placeholder="Escribe el N° de expediente o el nombre de la contraparte..." oninput="onModalCaseSearch(this.value)">
-    <datalist id="expedienteDatalist"></datalist>
+    <div class="autocomplete-wrap">
+      <input id="modalCaseSearch" autocomplete="off" placeholder="Escribe el N° de expediente o el nombre de la contraparte..." oninput="onModalCaseSearch(this.value)" onfocus="showCaseSuggestions(this.value)" onblur="setTimeout(hideCaseSuggestions,150)">
+      <div id="caseSuggestions" class="case-suggestions" style="display:none"></div>
+    </div>
   </div>
   <div class="modal-context" id="modalContext"></div>
   <div class="form-grid" id="modalFormBody">
@@ -386,7 +398,7 @@ table.req-table th:nth-child(8),table.req-table td:nth-child(8){width:11%}
 <div id="toastHost"></div>
 
 <script>
-const TODAY = new Date('2026-07-16T09:00:00');
+const TODAY = new Date();
 
 function mkHistory(arr){return arr.map(h=>({date:h[0],author:h[1],text:h[2]}))}
 
@@ -498,7 +510,7 @@ function useHistoricDoc(i){
   match.file=d.name.toLowerCase().replace(/[^a-z0-9]+/g,'_').slice(0,40)+'.pdf';
   match.history=match.history||[];
   const hh=String(TODAY.getHours()).padStart(2,'0'), mm=String(TODAY.getMinutes()).padStart(2,'0');
-  match.history.push({date:`16/07 ${hh}:${mm}`,author:'Repositorio histórico',text:`Se utilizó «${d.name}» (vigente, actualizado ${fmtDate(d.updated)}), sin necesidad de solicitarlo de nuevo al área.`});
+  match.history.push({date:`${todayShort()} ${hh}:${mm}`,author:'Repositorio histórico',text:`Se utilizó «${d.name}» (vigente, actualizado ${fmtDate(d.updated)}), sin necesidad de solicitarlo de nuevo al área.`});
   toast(`«${d.name}» vinculado al requerimiento «${match.doc}».`);
   render();
 }
@@ -521,8 +533,8 @@ function setRole(role){
   document.getElementById('fArea').style.display = role==='cliente'?'none':'inline-block';
   document.getElementById('newReqBtn').style.display = role==='abogado'?'inline-block':'none';
   const toolbarBtn=document.getElementById('addReqToolbarBtn'); if(toolbarBtn) toolbarBtn.style.display = role==='abogado'?'inline-block':'none';
-  document.getElementById('menuDebe').style.display = role==='abogado'?'flex':'none';
-  if(role==='cliente' && document.getElementById('debeView').style.display!=='none') showSection('expedientes');
+  updateDebeMenu();
+  if(role==='cliente' && clientArea!=='__coordinador__' && document.getElementById('debeView').style.display!=='none') showSection('expedientes');
   document.getElementById('fSearch').value='';
   document.getElementById('fArea').value='';
   document.getElementById('fStatus').value='';
@@ -538,8 +550,20 @@ function setClientArea(area){
   document.getElementById('fSearch').value='';
   document.getElementById('fStatus').value='';
   openDetail=null;
+  updateDebeMenu();
+  if(currentRole==='cliente' && area!=='__coordinador__' && document.getElementById('debeView').style.display!=='none') showSection('expedientes');
   render();
   toast(area==='__coordinador__' ? 'Vista de Coordinación: distribuye los encargos recibidos.' : `Área del cliente activa: ${area}`);
+}
+
+function updateDebeMenu(){
+  const isAbogado = currentRole==='abogado';
+  const isCoordinador = currentRole==='cliente' && clientArea==='__coordinador__';
+  document.getElementById('menuDebe').style.display = (isAbogado||isCoordinador) ? 'flex':'none';
+  document.getElementById('menuDebeIcon').textContent = isAbogado ? '🔔' : '📋';
+  document.getElementById('menuDebeLabel').textContent = isAbogado ? 'Debe el cliente' : 'Status de entrega de información por área';
+  document.getElementById('debeTitle').textContent = isAbogado ? 'Qué nos debe el cliente' : 'Status de entrega de información por área';
+  document.getElementById('debeSubtitle').textContent = isAbogado ? 'Todo lo pendiente de entrega en los 6 expedientes, sin importar el proceso' : 'Seguimiento de lo que cada área interna tiene pendiente de entregar, en todos los expedientes';
 }
 
 function fmtDate(iso){const [y,m,d]=iso.split('-');return `${d}/${m}/${y}`}
@@ -597,7 +621,7 @@ function addObservation(realIdx){
   const hh=String(TODAY.getHours()).padStart(2,'0'), mm=String(TODAY.getMinutes()).padStart(2,'0');
   x.history=x.history||[];
   const author = currentRole==='abogado' ? `Abg. ${datasets[currentCase].especialista}` : clientArea;
-  x.history.push({date:`16/07 ${hh}:${mm}`,author,text});
+  x.history.push({date:`${todayShort()} ${hh}:${mm}`,author,text});
   toast('Observación registrada en el expediente.');
   render();
 }
@@ -661,7 +685,7 @@ function distributeItem(realIdx,area){
   const text = wasAssigned && previousArea!==area
     ? `Encargo redirigido de ${previousArea} al área de ${area}.`
     : `Encargo distribuido internamente al área de ${area}.`;
-  x.history.push({date:`16/07 ${hh}:${mm}`,author:'Coordinación Cliente',text});
+  x.history.push({date:`${todayShort()} ${hh}:${mm}`,author:'Coordinación Cliente',text});
   toast(wasAssigned && previousArea!==area ? `Requerimiento redirigido a ${area}.` : `Requerimiento asignado a ${area}.`);
   render();
 }
@@ -766,14 +790,22 @@ function renderGlobalPending(){
   if(!host)return;
   const q=(document.getElementById('debeSearch')?.value||'').toLowerCase().trim();
   const area=document.getElementById('debeArea')?.value||'';
+  const estado=document.getElementById('debeEstado')?.value||'';
+  const fecha=document.getElementById('debeFecha')?.value||'';
   let rows=[];
   Object.keys(datasets).forEach(key=>{
     const ds=datasets[key];
     ds.items.forEach((x,idx)=>{
       if(x.status==='done')return;
       if(x.sent===false)return;
+      if(currentRole==='cliente' && clientArea!=='__coordinador__' && x.area!==clientArea)return;
       if(q && !x.doc.toLowerCase().includes(q))return;
       if(area && x.area!==area)return;
+      if(estado && x.status!==estado)return;
+      const dd=daysDiff(x.due);
+      if(fecha==='vencido' && dd>=0)return;
+      if(fecha==='proximo' && !(dd>=0&&dd<=3))return;
+      if(fecha==='semana' && !(dd>=0&&dd<=7))return;
       rows.push({x,key,ds,idx});
     });
   });
@@ -809,7 +841,8 @@ function switchCase(key){
   toast(`Expediente cambiado a ${datasets[key].label}`);
 }
 
-function todayISO(){return TODAY.toISOString().slice(0,10)}
+function todayISO(){const y=TODAY.getFullYear(),m=String(TODAY.getMonth()+1).padStart(2,'0'),d=String(TODAY.getDate()).padStart(2,'0');return `${y}-${m}-${d}`}
+function todayShort(){return fmtDate(todayISO()).slice(0,5)}
 const DOC_TYPES=['Boletas de pago','DNI / Documento de identidad','Contrato de trabajo','Carta de despido','Informe de jefatura','Liquidación de beneficios sociales','Constancia de trabajo','Control de asistencia y marcaciones','Correos electrónicos','Declaración jurada','Otro (especificar)'];
 let docRowCount=0;
 let modalTargetCase=null;
@@ -846,34 +879,50 @@ function fillModalContext(key){
   const ds=datasets[key];
   document.getElementById('modalContext').innerHTML=`Exp. ${ds.expediente} · ${ds.contraparte} vs. BCP<br>${ds.audienciaTipo} · ${fmtDate(ds.dueDate)}${ds.audienciaHora?' · '+ds.audienciaHora:''} — solicita: Abg. ${ds.responsable}`;
 }
-function onModalCaseSearch(value){
-  const v=value.trim().toLowerCase();
-  const found=Object.keys(datasets).find(k=>{
+function showCaseSuggestions(filter){
+  const box=document.getElementById('caseSuggestions');
+  const q=(filter||'').trim().toLowerCase();
+  const matches=Object.keys(datasets).filter(k=>{
     const d=datasets[k];
-    return `Exp. ${d.expediente} — ${d.contraparte}`.toLowerCase()===v;
+    return !q || d.expediente.toLowerCase().includes(q) || d.contraparte.toLowerCase().includes(q);
   });
-  if(found){
-    modalTargetCase=found;
-    fillModalContext(found);
-    document.getElementById('modalFormBody').style.opacity='1';
-    document.getElementById('modalFormBody').style.pointerEvents='auto';
+  if(!matches.length){
+    box.innerHTML='<div class="cs-empty">Sin resultados</div>';
   } else {
-    modalTargetCase=null;
-    document.getElementById('modalContext').innerHTML='Selecciona un expediente de la lista para continuar.';
-    document.getElementById('modalFormBody').style.opacity='.4';
-    document.getElementById('modalFormBody').style.pointerEvents='none';
+    box.innerHTML=matches.map(k=>{
+      const d=datasets[k];
+      return `<div class="cs-item" onmousedown="event.preventDefault();selectModalCase('${k}')"><b>Exp. ${d.expediente}</b><span>${d.contraparte}</span></div>`;
+    }).join('');
   }
+  box.style.display='block';
+}
+function hideCaseSuggestions(){
+  const box=document.getElementById('caseSuggestions');
+  if(box) box.style.display='none';
+}
+function onModalCaseSearch(value){
+  modalTargetCase=null;
+  document.getElementById('modalContext').innerHTML='Selecciona un expediente de la lista para continuar.';
+  document.getElementById('modalFormBody').style.opacity='.4';
+  document.getElementById('modalFormBody').style.pointerEvents='none';
+  showCaseSuggestions(value);
+}
+function selectModalCase(key){
+  modalTargetCase=key;
+  const ds=datasets[key];
+  document.getElementById('modalCaseSearch').value=`Exp. ${ds.expediente} — ${ds.contraparte}`;
+  hideCaseSuggestions();
+  fillModalContext(key);
+  document.getElementById('modalFormBody').style.opacity='1';
+  document.getElementById('modalFormBody').style.pointerEvents='auto';
 }
 function openModal(global){
   modalTargetCase = global ? null : currentCase;
   document.getElementById('modalSearchWrap').style.display = global ? 'block' : 'none';
   document.getElementById('modalFormBody').style.opacity='1';
+  hideCaseSuggestions();
   if(global){
     document.getElementById('modalCaseSearch').value='';
-    document.getElementById('expedienteDatalist').innerHTML=Object.keys(datasets).map(k=>{
-      const d=datasets[k];
-      return `<option value="Exp. ${d.expediente} — ${d.contraparte}">`;
-    }).join('');
     document.getElementById('modalContext').innerHTML='Selecciona un expediente de la lista para continuar.';
     document.getElementById('modalFormBody').style.opacity='.4';
     document.getElementById('modalFormBody').style.pointerEvents='none';
@@ -889,7 +938,7 @@ function openModal(global){
   addDocRow();
   document.getElementById('modal').classList.add('show');
 }
-function closeModal(){document.getElementById('modal').classList.remove('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show');hideCaseSuggestions();}
 function addRequirement(){
   if(!modalTargetCase){toast('Selecciona el expediente para el que es este requerimiento.');return}
   const ds=datasets[modalTargetCase];
@@ -935,7 +984,7 @@ function sendSelectedDrafts(){
   draftSelection.forEach(x=>{
     x.sent=true;
     x.history=x.history||[];
-    x.history.push({date:`16/07 ${hh}:${mm}`,author:`Abg. ${x.owner}`,text:'Requerimiento enviado al cliente.'});
+    x.history.push({date:`${todayShort()} ${hh}:${mm}`,author:`Abg. ${x.owner}`,text:'Requerimiento enviado al cliente.'});
   });
   const n=draftSelection.size;
   draftSelection.clear();
@@ -967,11 +1016,12 @@ function confirmUpload(){
   const comment=document.getElementById('uploadComment').value.trim()||'Documento cargado directamente por el cliente.';
   const hh=String(TODAY.getHours()).padStart(2,'0'), mm=String(TODAY.getMinutes()).padStart(2,'0');
   x.history=x.history||[];
-  x.history.push({date:`16/07 ${hh}:${mm}`,author:x.area,text:comment});
+  x.history.push({date:`${todayShort()} ${hh}:${mm}`,author:x.area,text:comment});
   closeUploadModal();render();
   toast('Documento cargado y entrega registrada correctamente.');
 }
 
+updateDebeMenu();
 render();
 </script>
 </body>
